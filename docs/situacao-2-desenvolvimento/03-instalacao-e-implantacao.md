@@ -28,6 +28,9 @@ Acesse http://localhost:3000. O comando `dev` aplica as migrações e o seed no 
 |---|---|---|
 | `DATABASE_URL` | sim | String de conexão PostgreSQL (ex.: `postgresql://usuario:senha@host/db?sslmode=require`). Sem ela o app usa o PGlite local |
 | `SESSION_SECRET` | sim | Segredo para assinar a sessão (mínimo 32 caracteres aleatórios) |
+| `ADMIN_NOME`, `ADMIN_EMAIL`, `ADMIN_SENHA` | recomendado | Cria (ou atualiza) um administrador pessoal ao rodar `npm run db:setup`. Assim você não depende da conta de demonstração, cuja senha está publicada no README |
+
+Localmente, coloque essas variáveis em `.env.local` na raiz. Esse arquivo está no `.gitignore` e nunca vai para o GitHub. O `npm run db:setup` lê o arquivo automaticamente.
 
 Gerar um segredo:
 
@@ -40,7 +43,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 1. **Banco:** crie um projeto em [neon.tech](https://neon.tech) e copie a *connection string* (com `sslmode=require`).
 2. **Migrações e seed no banco de produção** (na sua máquina):
    ```bash
-   DATABASE_URL="postgresql://..." npm run db:setup
+   DATABASE_URL="postgresql://..." ADMIN_EMAIL="voce@exemplo.com" ADMIN_SENHA="SuaSenha123" npm run db:setup
    ```
    No PowerShell: `$env:DATABASE_URL="postgresql://..."; npm run db:setup`
 3. **Aplicação:** em [vercel.com](https://vercel.com) importe o repositório do GitHub, configure `DATABASE_URL` e `SESSION_SECRET` em *Settings → Environment Variables* e faça o deploy. O comando de build padrão (`next build`) já serve.

@@ -7,6 +7,7 @@
  *   cliente@docenuvem.com.br / Cliente1234
  */
 import bcrypt from "bcryptjs";
+import { eq } from "drizzle-orm";
 import type { DB } from "../src/models/db/client";
 import { categorias, cupons, produtos, usuarios } from "../src/models/db/schema";
 
@@ -83,4 +84,28 @@ export async function semearBanco(db: DB, opcoes: { log?: boolean } = {}) {
   ]);
 
   if (opcoes.log) console.log(`Seed: ${CATEGORIAS.length} categorias, ${PRODUTOS.length} produtos, 3 cupons e 2 usuários criados.`);
+}
+
+/**
+ * Cria (ou atualiza) um administrador pessoal a partir de variáveis de ambiente,
+ * para não depender da conta de demonstração com senha pública:
+ *   ADMIN_NOME, ADMIN_EMAIL, ADMIN_SENHA  (definir em .env.local ou nas variáveis do deploy)
+ */
+export async function garantirAdminPessoal(db: DB) {
+  const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const senha = process.env.ADMIN_SENHA;
+  if (!email || !senha) return;
+  if (senha.length < 8 || !/[A-Za-z]/.test(senha) || !/d/.test(senha)) {
+    throw new Error("ADMIN_SENHA precisa ter 8+ caracteres, com letras e números (RN10).");
+  }
+  const nome = process.env.ADMIN_NOME?.trim() || "Administrador";
+  const senhaHash = await bcrypt.hash(senha, 10);
+  const existente = await db.query.usuarios.findFirst({ where: eq(usuarios.email, email) });
+  if (existente) {
+    await db.update(usuarios).set({ nome, senhaHash, papel: "ADMIN" }).where(eq(usuarios.id, existente.id));
+    console.log(`Admin pessoal atualizado: ${email}`);
+  } else {
+    await db.insert(usuarios).values({ nome, email, senhaHash, papel: "ADMIN" });
+    console.log(`Admin pessoal criado: ${email}`);
+  }
 }

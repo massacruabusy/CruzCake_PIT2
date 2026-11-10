@@ -3,10 +3,13 @@
  *   npm run db:setup
  * Sem DATABASE_URL usa o PGlite local em `.data/pglite`; com DATABASE_URL usa o PostgreSQL informado.
  */
-import { mkdirSync } from "node:fs";
+import { existsSync, mkdirSync } from "node:fs";
 import * as schema from "../src/models/db/schema";
 import { PASTA_MIGRACOES, PASTA_PGLITE, type DB } from "../src/models/db/client";
-import { semearBanco } from "./seed";
+import { garantirAdminPessoal, semearBanco } from "./seed";
+
+// Carrega variáveis locais (ex.: ADMIN_EMAIL/ADMIN_SENHA) do .env.local, que não vai para o Git.
+if (existsSync(".env.local")) process.loadEnvFile(".env.local");
 
 async function main() {
   const url = process.env.DATABASE_URL;
@@ -18,6 +21,7 @@ async function main() {
     const db = drizzle({ client: pool, schema });
     await migrate(db, { migrationsFolder: PASTA_MIGRACOES });
     await semearBanco(db as unknown as DB, { log: true });
+    await garantirAdminPessoal(db as unknown as DB);
     await pool.end();
   } else {
     mkdirSync(PASTA_PGLITE, { recursive: true });
@@ -28,6 +32,7 @@ async function main() {
     const db = drizzle({ client: cliente, schema });
     await migrate(db, { migrationsFolder: PASTA_MIGRACOES });
     await semearBanco(db as unknown as DB, { log: true });
+    await garantirAdminPessoal(db as unknown as DB);
     await cliente.close();
   }
   console.log("Banco pronto.");
