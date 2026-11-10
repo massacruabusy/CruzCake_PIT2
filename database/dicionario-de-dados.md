@@ -78,6 +78,23 @@ Cupons de desconto (RN05).
 | valido_ate | timestamptz | | | Nulo = sem prazo |
 | ativo | boolean | NN | `true` | |
 
+## zonas_entrega
+Zonas de entrega cadastradas pela loja (RN02). Migração `0001_zonas_de_entrega.sql`. Se um CEP estiver em mais de uma zona ativa, vale a faixa mais específica (menor intervalo).
+
+| Coluna | Tipo | Restrições | Padrão | Domínio / Descrição |
+|---|---|---|---|---|
+| id | serial | PK | auto | |
+| nome | varchar(80) | NN | | Ex.: "Centro expandido (SP)" (3–80 caracteres) |
+| cep_inicial | char(8) | NN, CHECK 8 dígitos e ≤ cep_final | | Início da faixa, só números |
+| cep_final | char(8) | NN, CHECK 8 dígitos | | Fim da faixa, só números |
+| valor_centavos | integer | NN, CHECK ≥ 0 | | Frete cobrado (0 = sempre grátis); até R$ 1.000,00 na aplicação |
+| frete_gratis_a_partir_centavos | integer | | | Valor dos produtos (já com desconto) a partir do qual o frete é grátis; nulo = nunca grátis |
+| prazo_horas | integer | NN, CHECK > 0 | | Prazo de entrega após o preparo (1–240 h na aplicação) |
+| ativo | boolean | NN | `true` | Zona inativa não é considerada na cotação |
+| criado_em | timestamptz | NN | `now()` | |
+
+Índice: `zonas_faixa_idx` (cep_inicial, cep_final).
+
 ## pedidos
 Cabeçalho do pedido, com valores e endereço congelados no momento da compra.
 
@@ -95,9 +112,10 @@ Cabeçalho do pedido, com valores e endereço congelados no momento da compra.
 | entrega_cidade | varchar(80) | | | |
 | entrega_uf | char(2) | | | |
 | cupom_id | integer | FK → cupons.id (SET NULL) | | Cupom aplicado |
+| zona_entrega_id | integer | FK → zonas_entrega.id (SET NULL) | | Zona que atendeu o CEP (só em ENTREGA). Criada na migração 0001 |
 | subtotal_centavos | integer | NN | | Soma dos itens |
 | desconto_centavos | integer | NN | `0` | Desconto do cupom |
-| frete_centavos | integer | NN | `0` | RN02 |
+| frete_centavos | integer | NN | `0` | RN02: frete da zona no momento da compra (congelado) |
 | total_centavos | integer | NN, CHECK ≥ 0 | | subtotal − desconto + frete (RN01) |
 | observacao | varchar(300) | | | Recado do cliente para a loja |
 | criado_em | timestamptz | NN | `now()` | |

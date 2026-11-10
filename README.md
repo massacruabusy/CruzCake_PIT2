@@ -14,9 +14,9 @@ Projeto das disciplinas **Projeto Integrador Transdisciplinar em Engenharia de S
 
 ## Funcionalidades
 
-**Cliente:** cardápio com categorias e busca · página do produto com ingredientes · carrinho persistente com estoque em tempo real · cupons de desconto · frete com regra de gratuidade · cadastro e login · checkout com entrega (CEP preenchido automaticamente) ou retirada · PIX e cartão (simulados, com cenário de recusa) · acompanhamento do pedido em linha do tempo · cancelamento antes do preparo.
+**Cliente:** cardápio com categorias e busca (só o que está disponível hoje) · caixas e kits em destaque · página do produto com ingredientes · **cotação de frete pelo CEP sem login** (endereço, zona, valor e prazo) · minicarrinho lateral · carrinho persistente com estoque em tempo real · cupons de desconto · cadastro e login · checkout com entrega (CEP preenchido automaticamente) ou retirada · PIX e cartão (simulados, com cenário de recusa) · acompanhamento do pedido em linha do tempo · cancelamento antes do preparo.
 
-**Administração:** indicadores e alerta de estoque baixo · cadastro e edição de produtos · lista de pedidos por situação · avanço de status com máquina de estados (só as etapas válidas aparecem) · cancelamento com devolução ao estoque.
+**Administração:** indicadores e alerta de estoque baixo · cadastro e edição de produtos · **zonas de entrega** (faixa de CEP, frete, prazo, frete grátis) · lista de pedidos por situação · avanço de status com máquina de estados (só as etapas válidas aparecem) · cancelamento com devolução ao estoque.
 
 ## Stack
 
@@ -29,7 +29,7 @@ Requer Node.js 20.9+ e **não exige instalar banco**:
 ```bash
 npm install
 npm run dev        # cria o banco local (migrações + seed) e abre em http://localhost:3000
-npm test           # 52 testes unitários e de integração
+npm test           # 62 testes unitários e de integração
 ```
 
 Contas de demonstração: `cliente@cruzcake.com.br` / `Cliente1234` e `admin@cruzcake.com.br` / `Admin1234`. Cartão aprovado `4111 1111 1111 1111`; recusado `4000 0000 0002 0000`. Mais dados no [manual de uso](docs/situacao-2-desenvolvimento/02-manual-de-uso.md). Deploy (Vercel + Neon): [instalação e implantação](docs/situacao-2-desenvolvimento/03-instalacao-e-implantacao.md).
@@ -38,7 +38,7 @@ Contas de demonstração: `cliente@cruzcake.com.br` / `Cliente1234` e `admin@cru
 
 ### Situação 1: planejamento revisado
 1. [Escopo e revisão do PIT I (Kaizen)](docs/situacao-1-planejamento/01-escopo-e-revisao.md)
-2. [Histórias de usuário (32 cartões, 91 pontos)](docs/situacao-1-planejamento/02-historias-de-usuario.md)
+2. [Histórias de usuário (38 cartões, 108 pontos)](docs/situacao-1-planejamento/02-historias-de-usuario.md)
 3. [Mapa de afinidade, backlog priorizado, sprints e tarefas](docs/situacao-1-planejamento/03-mapa-de-afinidade-e-backlog.md)
 4. [Casos de uso: diagrama geral e expandidos](docs/situacao-1-planejamento/04-casos-de-uso.md)
 5. [Diagramas UML: classes, sequência, atividades, estados, MVC](docs/situacao-1-planejamento/05-diagramas-uml.md)

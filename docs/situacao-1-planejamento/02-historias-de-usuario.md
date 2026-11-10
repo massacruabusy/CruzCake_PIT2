@@ -4,12 +4,15 @@
 
 ## Personas e requerentes
 
+O sistema foi pensado para **três papéis de usuário**. São os mesmos papéis que os testadores (profissionais de e-commerce) vão assumir na validação da Situação 3.
+
 | Persona | Quem é | O que espera do sistema |
 |---|---|---|
-| **Visitante** | Pessoa que chega pela primeira vez (Instagram, Google, indicação) e ainda não tem conta | Ver o cardápio, preços e disponibilidade sem precisar se cadastrar |
-| **Cliente** | Pessoa cadastrada que compra para consumo próprio ou para presentear | Comprar rápido, pagar com PIX ou cartão, escolher entrega ou retirada e acompanhar o pedido |
-| **Administrador / Confeiteira** | Dona da loja e equipe da cozinha/balcão | Manter o cardápio e o estoque do dia, ver os pedidos que entram e avançar cada etapa até a entrega |
-| **Sistema / Gateway** | Serviços externos: gateway de pagamento (simulado nesta versão) e ViaCEP | Autorizar pagamentos e completar endereços automaticamente |
+| **Visitante** | Pessoa que chega pela primeira vez (Instagram, Google, indicação), ainda sem conta, decidindo se compra | Ver o cardápio, preços e disponibilidade do dia e saber **se a loja entrega no CEP dela, quanto custa e em quanto tempo**, tudo sem se cadastrar |
+| **Cliente** | Comprador recorrente, para consumo próprio ou para presentear | Comprar rápido, conferir o carrinho sem sair da página, pagar com PIX ou cartão, escolher entrega ou retirada e acompanhar o pedido |
+| **Administradora da loja** | Dona da loja (confeiteira) e equipe do balcão | Manter o cardápio e o estoque do dia, **definir onde entrega e quanto cobra de frete**, ver os pedidos que entram e avançar cada etapa até a entrega |
+
+Sistemas externos envolvidos: gateway de pagamento (simulado nesta versão) e serviço de CEP (ViaCEP, com BrasilAPI de reserva).
 
 **Requerentes** citados nos cartões: *Dona da loja* (cliente do projeto e patrocinadora), *Atendente* (balcão/WhatsApp, quem mais sofre com pedido errado), *Cliente final* (ouvido na imersão na loja) e *Equipe técnica* (histórias técnicas/spikes).
 
@@ -20,14 +23,14 @@ A numeração é a mesma usada nos comentários do código-fonte (`src/models/re
 | ID | Regra |
 |---|---|
 | RN01 | Valores monetários são guardados como inteiros em centavos. **Total = subtotal − desconto + frete** |
-| RN02 | Entrega custa **R$ 9,90** e é grátis a partir de **R$ 120,00** (calculado sobre o subtotal já com desconto). Retirada na loja não paga frete |
+| RN02 | **Frete por zona de entrega.** A loja cadastra zonas (faixa de CEP, valor, prazo em horas e, opcionalmente, valor para frete grátis). O frete é o da zona que cobre o CEP; havendo sobreposição, vale a faixa mais específica. O frete grátis é avaliado sobre o subtotal já com desconto. CEP fora das zonas ativas não pode receber entrega (só retirada). Retirada na loja não paga frete. Zonas de exemplo: Centro expandido (SP) R$ 9,90, grátis a partir de R$ 120, 2 h; Zona Leste (SP) R$ 14,90, grátis a partir de R$ 180, 3 h; Grande São Paulo R$ 19,90, sem frete grátis, 4 h |
 | RN03 | Não se vende acima do estoque. O estoque baixa quando o pedido é criado e volta quando o pedido é cancelado |
 | RN04 | Cada sabor aceita no máximo **24 unidades** por pedido |
 | RN05 | O cupom precisa estar ativo, dentro da validade e o subtotal precisa atingir o mínimo do cupom. O desconto nunca passa do subtotal. Cupons de exemplo: `BEMVINDO10` (10%, mínimo de R$ 30), `DOCE5` (R$ 5, mínimo de R$ 40) e `NATAL2025` (vencido) |
 | RN06 | O pagamento é **simulado**. Cartão: número válido no algoritmo de Luhn, validade MM/AA não vencida e CVV com 3 ou 4 dígitos; cartões terminados em `0000` são recusados. PIX: gera um código copia-e-cola e o pedido aguarda confirmação |
 | RN07 | Máquina de estados do pedido: Aguardando pagamento → Pago → Em preparo → Saiu para entrega (se for entrega) ou Pronto para retirada (se for retirada) → Entregue. O cancelamento só é possível até a etapa Em preparo |
 | RN08 | O cliente só cancela pelo app enquanto o pedido está *Aguardando pagamento* ou *Pago* |
-| RN09 | Apenas produtos **ativos** aparecem na vitrine. Os destaques vêm primeiro |
+| RN09 | Na vitrine e na busca aparecem apenas produtos **ativos e com estoque**: cupcake é produção do dia, então o esgotado sai da vitrine. A página direta do produto continua abrindo e informa "Esgotado hoje". Os destaques vêm primeiro |
 | RN10 | A senha deve ter de 8 a 72 caracteres, com pelo menos uma letra e um número |
 
 ---
@@ -95,7 +98,7 @@ A numeração é a mesma usada nos comentários do código-fonte (`src/models/re
 | **Requerente** | Cliente final |
 | **Ação** | Como **visitante**, eu quero **ver todos os cupcakes disponíveis com foto, preço e categoria** para que **eu decida o que comprar sem precisar perguntar no WhatsApp**. |
 | **Comentários** | É a página inicial (TELA-01). Mostra um banner com o cupom de boas-vindas, selo "Destaque" e selo "Últimas N" quando restam 5 unidades ou menos. |
-| **Critérios de aceitação** | CA#1 DADO produtos ativos e inativos, QUANDO a vitrine abre, ENTÃO apenas os ativos aparecem, com os destaques primeiro.<br>CA#2 DADO um produto com estoque entre 1 e 5, QUANDO aparece na vitrine, ENTÃO mostra o selo "Últimas N".<br>CA#3 DADO um produto esgotado, QUANDO aparece na vitrine, ENTÃO o botão fica "Esgotado" e desabilitado. |
+| **Critérios de aceitação** | CA#1 DADO produtos ativos e inativos, QUANDO a vitrine abre, ENTÃO apenas os ativos aparecem, com os destaques primeiro.<br>CA#2 DADO um produto com estoque entre 1 e 5, QUANDO aparece na vitrine, ENTÃO mostra o selo "Últimas N".<br>CA#3 DADO um produto esgotado, QUANDO a vitrine abre, ENTÃO ele não aparece (regra revisada, ver US35); se o cliente abrir o link direto, vê "Esgotado hoje" com o botão desabilitado. |
 | **Regras de negócio** | RN09 |
 | **Requisito não funcional** | RNF#1 Primeira carga em até 2 s em 4G. RNF#2 Imagens com texto alternativo. |
 | **Prioridade** | [A] |
@@ -110,7 +113,7 @@ A numeração é a mesma usada nos comentários do código-fonte (`src/models/re
 | **Título** | Filtrar por categoria |
 | **Requerente** | Cliente final |
 | **Ação** | Como **cliente**, eu quero **filtrar por Clássicos, Gourmet, Veganos e sem glúten ou Caixas e kits** para que **eu encontre rápido o que combina com minha restrição ou ocasião**. |
-| **Comentários** | Os filtros ficam numa barra rolável no celular. O filtro fica na URL (`?categoria=`), então dá para compartilhar o link. |
+| **Comentários** | Os filtros ficam numa barra rolável no celular. O filtro fica na URL (`?categoria=`), então dá para compartilhar o link. Na revisão, "Caixas e kits" passou a ser o 2º filtro (ver US36). |
 | **Critérios de aceitação** | CA#1 DADO a vitrine, QUANDO escolho "Veganos e sem glúten", ENTÃO só aparecem produtos dessa categoria e o chip fica destacado.<br>CA#2 DADO um filtro aplicado, QUANDO clico em "Todos", ENTÃO o cardápio completo volta. |
 | **Regras de negócio** | RN09 |
 | **Requisito não funcional** | RNF#1 O estado do filtro fica na URL. |
@@ -162,8 +165,8 @@ A numeração é a mesma usada nos comentários do código-fonte (`src/models/re
 | **Título** | Adicionar ao carrinho |
 | **Requerente** | Cliente final |
 | **Ação** | Como **visitante ou cliente**, eu quero **adicionar cupcakes ao carrinho sem precisar fazer login** para que **eu monte meu pedido com calma e só me identifique na hora de pagar**. |
-| **Comentários** | O carrinho fica salvo no navegador (localStorage) e sobrevive ao fechamento da aba. Um aviso flutuante confirma a adição. |
-| **Critérios de aceitação** | CA#1 DADO um produto disponível, QUANDO clico em "Adicionar", ENTÃO o contador do carrinho aumenta e vejo "N× produto adicionado ao carrinho".<br>CA#2 DADO que já tenho no carrinho a quantidade máxima permitida, QUANDO tento adicionar mais, ENTÃO vejo uma mensagem de limite e nada muda. |
+| **Comentários** | O carrinho fica salvo no navegador (localStorage) e sobrevive ao fechamento da aba. Ao adicionar, o minicarrinho abre para confirmar a adição (ver US37). |
+| **Critérios de aceitação** | CA#1 DADO um produto disponível, QUANDO clico em "Adicionar", ENTÃO o contador do carrinho aumenta e o minicarrinho abre mostrando o item.<br>CA#2 DADO que já tenho no carrinho a quantidade máxima permitida, QUANDO tento adicionar mais, ENTÃO vejo uma mensagem de limite e nada muda. |
 | **Regras de negócio** | RN03, RN04 |
 | **Requisito não funcional** | RNF#1 O carrinho persiste entre visitas no mesmo navegador. |
 | **Prioridade** | [A] |
@@ -210,8 +213,8 @@ A numeração é a mesma usada nos comentários do código-fonte (`src/models/re
 | **Título** | Ver frete e total antes de pagar |
 | **Requerente** | Cliente final |
 | **Ação** | Como **cliente**, eu quero **ver subtotal, desconto, frete e total antes de informar o pagamento** para que **eu não tenha surpresa no valor final**. |
-| **Comentários** | Na imersão, o frete-surpresa apareceu como principal motivo de abandono do app anterior. |
-| **Critérios de aceitação** | CA#1 DADO um subtotal de R$ 68,00 com 10% de desconto e entrega, QUANDO vejo o resumo, ENTÃO o frete é R$ 9,90 e o total é R$ 71,10.<br>CA#2 DADO um subtotal com desconto de R$ 120,00 ou mais, QUANDO escolho entrega, ENTÃO o frete aparece como "Grátis".<br>CA#3 DADO a opção retirada, QUANDO seleciono, ENTÃO aparece "Retirada na loja — Grátis". |
+| **Comentários** | Na imersão, o frete-surpresa apareceu como principal motivo de abandono do app anterior. Revisado: o frete deixou de ser fixo e passou a depender da zona do CEP (RN02, US33 e US34). Enquanto o CEP não é informado, o resumo mostra "Informe o CEP" e "Total sem frete". |
+| **Critérios de aceitação** | CA#1 DADO um subtotal de R$ 68,00 com 10% de desconto e entrega para o CEP 01310-100 (Centro expandido), QUANDO vejo o resumo, ENTÃO o frete é R$ 9,90 e o total é R$ 71,10.<br>CA#2 DADO um subtotal com desconto que atinge o mínimo de frete grátis da zona, QUANDO escolho entrega, ENTÃO o frete aparece como "Grátis".<br>CA#3 DADO a opção retirada, QUANDO seleciono, ENTÃO aparece "Retirada na loja — Grátis". |
 | **Regras de negócio** | RN01, RN02 |
 | **Requisito não funcional** | RNF#1 O resumo é recalculado a cada alteração em menos de 1 s. |
 | **Prioridade** | [A] |
@@ -298,7 +301,7 @@ A numeração é a mesma usada nos comentários do código-fonte (`src/models/re
 | **Título** | Preencher o endereço pelo CEP |
 | **Requerente** | Cliente final |
 | **Ação** | Como **cliente**, eu quero **digitar o CEP e ter rua, bairro, cidade e UF preenchidos automaticamente** para que **eu finalize mais rápido e com menos erro de digitação**. |
-| **Comentários** | Usa a API pública ViaCEP. Se o serviço estiver fora do ar, o cliente preenche manualmente. O endereço do pedido é copiado para o pedido no momento da compra. |
+| **Comentários** | Usa a base de CEPs dos Correios por meio de serviços públicos: ViaCEP (principal) e BrasilAPI (reserva). A API oficial dos Correios exige contrato. Se os dois serviços estiverem fora do ar, o cliente preenche manualmente. O endereço é copiado para o pedido no momento da compra. |
 | **Critérios de aceitação** | CA#1 DADO o CEP 01310-100, QUANDO saio do campo, ENTÃO "Avenida Paulista", "Bela Vista", "São Paulo" e "SP" são preenchidos.<br>CA#2 DADO um CEP inexistente, QUANDO saio do campo, ENTÃO vejo "CEP não encontrado".<br>CA#3 DADO o ViaCEP indisponível, QUANDO saio do campo, ENTÃO consigo digitar o endereço manualmente. |
 | **Regras de negócio** | — |
 | **Requisito não funcional** | RNF#1 O CEP é validado com 8 dígitos no servidor. RNF#2 Campos com `autocomplete` adequado. |
@@ -572,12 +575,120 @@ A numeração é a mesma usada nos comentários do código-fonte (`src/models/re
 
 ---
 
+## Evoluções incorporadas na revisão (Kaizen)
+
+Histórias acrescentadas na revisão do PIT II a partir de situações comuns em e-commerce: dúvida sobre entrega antes da compra, autonomia da loja para definir frete, vitrine poluída por itens esgotados, produtos de maior ticket pouco visíveis e necessidade de conferir o carrinho sem sair da página.
+
+### US33 — Consultar frete e prazo pelo CEP antes de comprar
+
+| Campo | Conteúdo |
+|---|---|
+| **ID** | US33 |
+| **Título** | Consultar frete e prazo pelo CEP antes de comprar |
+| **Requerente** | Cliente final |
+| **Ação** | Como **visitante**, eu quero **informar meu CEP na página do produto ou no carrinho e saber se a loja entrega, quanto custa e em quanto tempo** para que **eu decida se compro antes de criar conta**. |
+| **Comentários** | Em e-commerce, não saber se há entrega para o próprio endereço é causa clássica de abandono. A cotação é pública (sem login), mostra o endereço encontrado (rua, bairro, cidade/UF) e lembra que a retirada na loja é grátis. O CEP fica salvo e é reaproveitado no carrinho e no checkout. Telas TELA-02 e TELA-03. |
+| **Critérios de aceitação** | CA#1 DADO o CEP 08010-000, QUANDO calculo o frete, ENTÃO vejo "Rua Serra Dourada, São Miguel Paulista · São Paulo/SP" e "Entregamos! Zona Leste (SP): em até 3h após o preparo, por R$ 14,90 · grátis a partir de R$ 180,00".<br>CA#2 DADO o CEP 20040-002 (Rio de Janeiro), QUANDO calculo, ENTÃO vejo "Ainda não entregamos no CEP 20040-002" e a sugestão de retirar na loja.<br>CA#3 DADO o CEP 99999-999, QUANDO calculo, ENTÃO vejo "CEP não encontrado. Confira os números."<br>CA#4 DADO um CEP já calculado, QUANDO vou ao carrinho, ENTÃO o frete aparece no resumo sem digitar de novo. |
+| **Regras de negócio** | RN02 |
+| **Requisito não funcional** | RNF#1 Resposta em até 2 s. RNF#2 Se o serviço de CEP falhar, a cotação de frete continua funcionando (só não mostra o endereço). |
+| **Prioridade** | [A] |
+| **Pontos de história** | 3 |
+| **Status no MVP** | Implementado |
+| **Origem** | Evolução proposta a partir de situações reais de e-commerce |
+
+### US34 — Gerenciar zonas de entrega e frete
+
+| Campo | Conteúdo |
+|---|---|
+| **ID** | US34 |
+| **Título** | Gerenciar zonas de entrega e frete |
+| **Requerente** | Dona da loja |
+| **Ação** | Como **administradora**, eu quero **cadastrar e editar zonas de entrega com faixa de CEP, valor do frete, prazo e valor mínimo para frete grátis** para que **eu ajuste onde entrego e quanto cobro sem depender de um desenvolvedor**. |
+| **Comentários** | TELA-16 (lista) e TELA-17 (formulário). Zonas podem se sobrepor: vale a faixa mais específica, o que permite, por exemplo, um bairro com frete diferente dentro da Grande SP. Zona inativa deixa de valer imediatamente. Promoções de preço continuam sendo feitas editando o preço do produto (decisão registrada em 01-escopo-e-revisao.md). |
+| **Critérios de aceitação** | CA#1 DADO uma zona nova válida, QUANDO salvo, ENTÃO ela aparece na lista e passa a valer na cotação.<br>CA#2 DADO o CEP final menor que o inicial, QUANDO salvo, ENTÃO vejo "Deve ser maior ou igual ao CEP inicial."<br>CA#3 DADO o campo "grátis a partir de" em branco, QUANDO salvo, ENTÃO a zona nunca tem frete grátis.<br>CA#4 DADO um cliente logado (não administrador), QUANDO acessa /admin/frete, ENTÃO é redirecionado para a vitrine. |
+| **Regras de negócio** | RN02 |
+| **Requisito não funcional** | RNF#1 Faixa e valores validados também no banco (CHECK). RNF#2 Acesso restrito ao papel ADMIN. |
+| **Prioridade** | [A] |
+| **Pontos de história** | 5 |
+| **Status no MVP** | Implementado |
+| **Origem** | Evolução proposta a partir de situações reais de e-commerce |
+
+### US35 — Ver na vitrine só o que dá para comprar hoje
+
+| Campo | Conteúdo |
+|---|---|
+| **ID** | US35 |
+| **Título** | Ver na vitrine só o que dá para comprar hoje |
+| **Requerente** | Cliente final |
+| **Ação** | Como **cliente**, eu quero **que a vitrine e a busca mostrem apenas cupcakes disponíveis hoje** para que **eu não perca tempo escolhendo algo que não posso comprar**. |
+| **Comentários** | Cupcake é produção do dia: mostrar esgotado polui a vitrine e frustra. O produto esgotado continua cadastrado e ativo; volta sozinho à vitrine quando a loja repõe o estoque. A página direta continua abrindo (links compartilhados não quebram) e informa "Esgotado hoje". |
+| **Critérios de aceitação** | CA#1 DADO "Coco e Maracujá" com estoque 0, QUANDO abro a vitrine ou busco "maracujá", ENTÃO ele não aparece.<br>CA#2 DADO o link direto do produto esgotado, QUANDO abro, ENTÃO vejo "Esgotado hoje, volte amanhã!" e o botão desabilitado.<br>CA#3 DADO que a loja repõe o estoque, QUANDO a vitrine recarrega, ENTÃO o produto volta a aparecer. |
+| **Regras de negócio** | RN09, RN03 |
+| **Requisito não funcional** | RNF#1 Filtro feito na consulta ao banco (não no navegador). |
+| **Prioridade** | [B] |
+| **Pontos de história** | 1 |
+| **Status no MVP** | Implementado |
+| **Origem** | Evolução proposta a partir de situações reais de e-commerce |
+
+### US36 — Identificar rapidamente as caixas e kits para presente
+
+| Campo | Conteúdo |
+|---|---|
+| **ID** | US36 |
+| **Título** | Identificar rapidamente as caixas e kits para presente |
+| **Requerente** | Dona da loja |
+| **Ação** | Como **visitante**, eu quero **perceber logo de cara que existem caixas e kits para presente** para que **eu considere uma compra maior quando estou procurando um presente**. |
+| **Comentários** | A foto de um cupcake isolado não comunica "caixa com 6". Solução: arte que mostra a caixa aberta com os cupcakes e a quantidade ("CAIXA COM 6", "KIT FESTA · 12 MINIS"), selo "📦 Kit para presentear" no card e a categoria "Caixas e kits" como 2º filtro. Fotos reais podem substituir as ilustrações sem mudar o código. |
+| **Critérios de aceitação** | CA#1 DADO a vitrine, QUANDO vejo o card de um kit, ENTÃO a imagem mostra a caixa com os cupcakes e o selo "Kit para presentear".<br>CA#2 DADO os filtros de categoria no celular, QUANDO a vitrine abre, ENTÃO "Caixas e kits" aparece sem precisar rolar a barra. |
+| **Regras de negócio** | RN09 |
+| **Requisito não funcional** | RNF#1 Imagem com texto alternativo descrevendo o conteúdo da caixa. |
+| **Prioridade** | [B] |
+| **Pontos de história** | 2 |
+| **Status no MVP** | Implementado |
+| **Origem** | Evolução proposta a partir de situações reais de e-commerce |
+
+### US37 — Conferir e ajustar o carrinho no minicarrinho
+
+| Campo | Conteúdo |
+|---|---|
+| **ID** | US37 |
+| **Título** | Conferir e ajustar o carrinho no minicarrinho |
+| **Requerente** | Cliente final |
+| **Ação** | Como **cliente**, eu quero **um minicarrinho lateral para conferir e ajustar os itens sem sair da página** para que **eu continue escolhendo sabores sem perder o lugar no cardápio**. |
+| **Comentários** | Padrão de mercado em e-commerce. Abre pelo ícone do carrinho e automaticamente ao adicionar um produto. Mostra itens, quantidades, subtotal e os botões "Ver carrinho e finalizar" e "Continuar comprando". Cupom e frete continuam no carrinho completo (TELA-03). |
+| **Critérios de aceitação** | CA#1 DADO um produto disponível, QUANDO clico em "Adicionar", ENTÃO o minicarrinho abre com o item.<br>CA#2 DADO o minicarrinho aberto, QUANDO aperto Esc, clico fora ou no ×, ENTÃO ele fecha e continuo na mesma página.<br>CA#3 DADO um item no minicarrinho, QUANDO uso + / − / Remover, ENTÃO o subtotal e o contador do cabeçalho atualizam na hora. |
+| **Regras de negócio** | RN04 |
+| **Requisito não funcional** | RNF#1 Acessível: role="dialog", foco no botão fechar ao abrir, Esc fecha. RNF#2 Ocupa a tela inteira no celular. |
+| **Prioridade** | [B] |
+| **Pontos de história** | 3 |
+| **Status no MVP** | Implementado |
+| **Origem** | Evolução proposta a partir de situações reais de e-commerce |
+
+### US38 — Programar preço promocional
+
+| Campo | Conteúdo |
+|---|---|
+| **ID** | US38 |
+| **Título** | Programar preço promocional |
+| **Requerente** | Dona da loja |
+| **Ação** | Como **administradora**, eu quero **definir um preço promocional com data e hora de início e fim** para que **a promoção entre e saia do ar sozinha, sem eu precisar lembrar de mudar o preço**. |
+| **Comentários** | Decisão de produto nesta versão: não há módulo de promoção; a loja faz promoção alterando o preço do produto no painel (US29) e usa cupons (US10). Esta história fica no backlog para quando as promoções ficarem frequentes. Deve exibir "de R$ X por R$ Y" na vitrine. |
+| **Critérios de aceitação** | CA#1 DADO uma promoção agendada para sexta das 18h às 22h, QUANDO chega 18h, ENTÃO a vitrine mostra o preço promocional e o preço antigo riscado; às 22h volta ao normal. |
+| **Regras de negócio** | RN01, nova regra: preço promocional menor que o preço normal |
+| **Requisito não funcional** | — |
+| **Prioridade** | [C] |
+| **Pontos de história** | 3 |
+| **Status no MVP** | Backlog futuro |
+| **Origem** | Evolução proposta a partir de situações reais de e-commerce |
+
+---
+
 ## Totais
 
 | Situação | Histórias | Pontos |
 |---|---|---|
-| Implementadas no MVP | 25 (US01–US13, US15–US20, US23–US25, US28–US30) | 67 |
-| Backlog futuro | 7 (US14, US21, US22, US26, US27, US31, US32) | 24 |
-| **Total** | **32** | **91** |
+| Implementadas no MVP | 30 (US01–US13, US15–US20, US23–US25, US28–US30, US33–US37) | 81 |
+| Backlog futuro | 8 (US14, US21, US22, US26, US27, US31, US32, US38) | 27 |
+| **Total** | **38** | **108** |
 
-Os números são coerentes com o levantamento do PIT I, que registrou cerca de 30 cartões e 90 pontos.
+O levantamento do PIT I registrou cerca de 30 cartões e 90 pontos (32 cartões / 91 pontos na primeira revisão). Na revisão Kaizen do PIT II o backlog cresceu para 38 cartões e 108 pontos com as evoluções US33–US38. A história de frete fixo (US11) foi revisada para a regra de frete por zona.

@@ -16,8 +16,8 @@
 
 Os testes seguiram o [Plano de Testes](01-plano-de-testes.md), organizado pelos níveis do Modelo V:
 
-1. **Verificação:** TypeScript, ESLint, build de produção, 52 testes automatizados (unitários + integração com PostgreSQL em memória).
-2. **Teste de sistema:** 22 casos manuais ponta a ponta ([02-casos-de-teste-manuais.md](02-casos-de-teste-manuais.md)).
+1. **Verificação:** TypeScript, ESLint, build de produção, 62 testes automatizados (unitários + integração com PostgreSQL em memória).
+2. **Teste de sistema:** 30 casos manuais ponta a ponta ([02-casos-de-teste-manuais.md](02-casos-de-teste-manuais.md)).
 3. **Validação/aceitação:** 5 testadores reais usando o app publicado, com registro pelo [formulário](03-formulario-teste-usuarios.md) e consolidação nas [fichas](04-fichas-dos-testadores.md).
 4. Correção dos defeitos pertinentes, reteste e atualização deste laudo.
 
@@ -38,8 +38,8 @@ Classificação de gravidade:
 | Indicador | Resultado |
 |---|---|
 | Arquivos de teste | 4 |
-| Testes executados | 52 |
-| Aprovados | **52 (100%)** |
+| Testes executados | 62 |
+| Aprovados | **62 (100%)** |
 | Reprovados | 0 |
 | Regras de negócio cobertas | RN01 a RN10 (ver matriz no plano de testes) |
 | TypeScript (`npm run typecheck`) | Sem erros |
@@ -54,7 +54,7 @@ Reexecução após as correções: [preencher: X/X aprovados em DD/MM/AAAA]
 
 | Indicador | Resultado |
 |---|---|
-| Casos planejados | 22 |
+| Casos planejados | 30 |
 | Executados | [preencher] (4 executados em 09/11/2026: CT-01 a CT-04) |
 | Passou | [preencher] |
 | Falhou | [preencher] |
@@ -112,7 +112,7 @@ As melhorias incorporadas também devem ser refletidas na documentação: histó
 
 [preencher após a rodada de testes. Modelo:]
 
-> Com base nos testes automatizados (52/52 aprovados), na execução de [N]/22 casos de teste de sistema e na avaliação de 5 usuários, a versão [versão] da CruzCake Cupcakes **[atende / atende com ressalvas / não atende]** aos requisitos definidos. Foram corrigidos [N] defeitos ([N] de gravidade alta) e incorporadas [N] melhorias sugeridas. Permanecem [N] pendências de baixa gravidade, justificadas na seção 6, que não impedem o uso da solução.
+> Com base nos testes automatizados (62/62 aprovados), na execução de [N]/30 casos de teste de sistema e na avaliação de 5 usuários, a versão [versão] da CruzCake Cupcakes **[atende / atende com ressalvas / não atende]** aos requisitos definidos. Foram corrigidos [N] defeitos ([N] de gravidade alta) e incorporadas [N] melhorias sugeridas. Permanecem [N] pendências de baixa gravidade, justificadas na seção 6, que não impedem o uso da solução.
 
 Data: [preencher]
 Responsável: Guilherme Henrique Dalla Rosa

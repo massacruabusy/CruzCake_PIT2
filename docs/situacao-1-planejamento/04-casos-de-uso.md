@@ -8,9 +8,9 @@
 |---|---|---|
 | **Visitante** | Primário | Pessoa não autenticada que navega pelo cardápio e monta o carrinho |
 | **Cliente** | Primário | Visitante autenticado (especialização do Visitante) que compra, paga e acompanha pedidos |
-| **Administrador** | Primário | Dona da loja, confeiteira ou atendente com papel ADMIN; mantém produtos e opera os pedidos |
+| **Administrador** | Primário | Administradora da loja (dona/confeiteira ou balcão) com papel ADMIN; mantém produtos, zonas de entrega e opera os pedidos |
 | **Gateway de Pagamento (simulado)** | Secundário | Autoriza o cartão e confirma o PIX. Nesta versão é simulado em `src/models/regras/pagamento.ts` |
-| **ViaCEP** | Secundário | Serviço público que devolve o endereço a partir do CEP |
+| **ViaCEP** | Secundário | Serviço público que devolve o endereço a partir do CEP (base dos Correios); a BrasilAPI é usada como reserva |
 
 ## 2. Diagrama de caso de uso geral
 
@@ -38,6 +38,8 @@ flowchart LR
         UCA["Aplicar cupom"]
         UCB["Buscar endereço por CEP"]
         UCP["Ver painel de indicadores"]
+        UC13["UC13 Cotar frete pelo CEP"]
+        UC14["UC14 Manter zonas de entrega"]
     end
 
     VIS --- UC01
@@ -45,6 +47,7 @@ flowchart LR
     VIS --- UC03
     VIS --- UC04
     VIS --- UC05
+    VIS --- UC13
     CLI -. "generalização" .-> VIS
     CLI --- UC06
     CLI --- UC09
@@ -53,6 +56,7 @@ flowchart LR
     ADM --- UC11
     ADM --- UC12
     ADM --- UCP
+    ADM --- UC14
 
     UC06 -. "«include»" .-> UC05
     UC06 -. "«include»" .-> UC03
@@ -62,13 +66,15 @@ flowchart LR
     UCB -. "«extend»" .-> UC06
     UC10 -. "«extend»" .-> UC09
     UC12 -. "«include»" .-> UC09
+    UC13 -. "«include»" .-> UCB
+    UC06 -. "«include»" .-> UC13
 
     UC07 --- GW
     UC08 --- GW
     UCB --- CEP
 ```
 
-**Como ler:** o Cliente herda tudo o que o Visitante pode fazer. *Realizar pedido* **inclui** autenticação e carrinho (são obrigatórios). Pagar com cartão, pagar com PIX e buscar CEP **estendem** o pedido conforme a escolha do cliente.
+**Como ler:** o Cliente herda tudo o que o Visitante pode fazer. *Realizar pedido* **inclui** autenticação, carrinho e (na entrega) a cotação de frete pelo CEP. Pagar com cartão, pagar com PIX e buscar CEP **estendem** o pedido conforme a escolha do cliente. *Cotar frete pelo CEP* é público: o Visitante usa antes de criar conta, e ele **inclui** a busca do endereço no ViaCEP. As zonas usadas na cotação são mantidas pelo Administrador (UC14).
 
 ## 3. Lista de casos de uso
 
@@ -86,8 +92,10 @@ flowchart LR
 | UC10 | Cancelar pedido | Cliente | US25 | TELA-07 |
 | UC11 | Manter produto | Administrador | US29 | TELA-12, TELA-13 |
 | UC12 | Gerenciar status do pedido | Administrador | US28, US30 | TELA-09, TELA-10, TELA-11 |
+| UC13 | Cotar frete pelo CEP | Visitante | US33, US11 | TELA-02, TELA-03, TELA-06 |
+| UC14 | Manter zonas de entrega | Administrador | US34 | TELA-16, TELA-17 |
 
-**Telas referenciadas:** TELA-01 Vitrine · TELA-02 Detalhe do produto · TELA-03 Carrinho · TELA-04 Entrar · TELA-05 Cadastro · TELA-06 Checkout · TELA-07 Pedido (confirmação/acompanhamento) · TELA-08 Meus pedidos · TELA-09 Painel admin · TELA-10 Pedidos admin · TELA-11 Detalhe do pedido admin · TELA-12 Produtos admin · TELA-13 Formulário de produto · TELA-14 Página não encontrada · TELA-15 Erro inesperado.
+**Telas referenciadas:** TELA-01 Vitrine · TELA-02 Detalhe do produto · TELA-03 Carrinho · TELA-04 Entrar · TELA-05 Cadastro · TELA-06 Checkout · TELA-07 Pedido (confirmação/acompanhamento) · TELA-08 Meus pedidos · TELA-09 Painel admin · TELA-10 Pedidos admin · TELA-11 Detalhe do pedido admin · TELA-12 Produtos admin · TELA-13 Formulário de produto · TELA-14 Página não encontrada · TELA-15 Erro inesperado · TELA-16 Zonas de entrega (admin) · TELA-17 Formulário de zona (admin) · Minicarrinho (gaveta sobre qualquer tela).
 
 ---
 
@@ -107,8 +115,8 @@ flowchart LR
 2. O sistema verifica a sessão e exibe a TELA-06 – Checkout com o resumo de valores calculado no servidor (RN01, RN02, RN05). <Curso alternativo Alfa>
 3. O cliente escolhe **Entrega** ou **Retirada na loja**. <Curso alternativo Beta>
 4. O sistema apresenta os endereços salvos do cliente; se não houver, apresenta o formulário de endereço.
-5. O cliente seleciona um endereço salvo ou informa um novo; ao digitar o CEP, o sistema consulta o ViaCEP e preenche rua, bairro, cidade e UF. <Curso alternativo Gama>
-6. O sistema recalcula o frete conforme o tipo de recebimento (RN02).
+5. O cliente seleciona um endereço salvo ou informa um novo; ao digitar o CEP, o sistema consulta o ViaCEP (ou a BrasilAPI) e preenche rua, bairro, cidade e UF. <Curso alternativo Gama>
+6. O sistema cota o frete pelo CEP (UC13): identifica a zona de entrega, exibe "Entregamos! [zona]: em até Nh após o preparo" e recalcula o resumo (RN02). <Curso alternativo Zeta>
 7. O cliente escolhe a forma de pagamento: cartão (UC07) ou PIX (UC08).
 8. O cliente informa uma observação opcional e clica em confirmar.
 9. O sistema valida os dados de entrada (formato de CEP, UF, cartão, limite de 24 por item – RN04). <Curso alternativo Delta>
@@ -130,6 +138,11 @@ flowchart LR
 **Curso alternativo Gama:** CEP não encontrado ou ViaCEP indisponível.
 - Gama5.1: O sistema exibe "CEP não encontrado. Confira ou preencha o endereço manualmente." (se o ViaCEP estiver fora do ar, apenas não preenche).
 - Gama5.2: O cliente preenche o endereço manualmente e o caso de uso segue no passo 6.
+
+**Curso alternativo Zeta:** CEP fora da área de entrega.
+- Zeta6.1: O sistema exibe "Ainda não entregamos neste CEP. Escolha Retirar na loja ou use outro endereço." e bloqueia o botão de confirmar.
+- Zeta6.2: Se a confirmação for forçada via API, o sistema recusa com ENTREGA_INDISPONIVEL (HTTP 422), nada é gravado e a tela oferece "Mudar para retirada na loja".
+- Zeta6.3: O cliente escolhe retirada (Curso Beta) ou outro endereço (passo 5).
 
 **Curso alternativo Delta:** dados inválidos.
 - Delta9.1: O sistema devolve erro de validação com a mensagem associada a cada campo (ex.: "UF deve ter 2 letras.").
@@ -299,3 +312,64 @@ flowchart LR
 **Curso alternativo Beta:** o pedido já entrou em preparo (alteração feita pela loja enquanto a tela estava aberta).
 - Beta4.1: O sistema exibe "Seu pedido já está em preparo e não pode mais ser cancelado pelo app. Fale com a loja.".
 - Beta4.2: O caso de uso termina sem alterações.
+
+---
+
+### UC13 — Cotar frete pelo CEP
+
+**Nome:** Cotar frete pelo CEP
+**Identificador:** UC13
+**Descrição:** O visitante informa o CEP na página do produto ou no carrinho e descobre, sem criar conta, se a loja entrega no endereço, o valor do frete, o prazo e o mínimo para frete grátis.
+**Atores:** Visitante (principal); ViaCEP / BrasilAPI (secundário).
+**Pré-condições:** existe ao menos uma zona de entrega ativa cadastrada (UC14).
+**Pós-condições:** o CEP fica salvo no navegador e é reaproveitado no carrinho e no checkout; nenhum dado é gravado no servidor.
+
+**Curso básico de ação:**
+1. O caso de uso começa quando o visitante, na TELA-02 – Produto ou na TELA-03 – Carrinho, preenche o campo "Entregamos no seu endereço?" e clica em "Calcular".
+2. O sistema valida que o CEP tem 8 dígitos. <Curso alternativo Alfa>
+3. O sistema consulta o endereço do CEP no ViaCEP (com a BrasilAPI de reserva). <Curso alternativo Beta> <Curso alternativo Gama>
+4. O sistema procura a zona de entrega ativa que cobre o CEP; se houver mais de uma, usa a faixa mais específica (RN02). <Curso alternativo Delta>
+5. O sistema calcula o frete da zona sobre o valor dos produtos já com desconto: grátis se atingir o mínimo da zona; senão, o valor da zona (RN02).
+6. O sistema exibe o endereço ("📍 Rua Serra Dourada, São Miguel Paulista · São Paulo/SP") e a cotação ("Entregamos! Zona Leste (SP): em até 3h após o preparo, por R$ 14,90 · grátis a partir de R$ 180,00.").
+7. O sistema guarda o CEP no navegador; no carrinho, o resumo passa a mostrar o frete e o total com frete.
+8. O caso de uso termina.
+
+**Curso alternativo Alfa:** CEP incompleto.
+- Alfa2.1: O sistema exibe "Digite os 8 números do CEP." e o caso de uso volta ao passo 1.
+
+**Curso alternativo Beta:** CEP inexistente.
+- Beta3.1: O sistema exibe "CEP não encontrado. Confira os números." e o caso de uso volta ao passo 1.
+
+**Curso alternativo Gama:** serviços de CEP fora do ar.
+- Gama3.1: O sistema segue sem o endereço; a cotação por zona (passos 4 a 7) funciona normalmente, só sem a linha do endereço.
+
+**Curso alternativo Delta:** a loja não entrega no CEP.
+- Delta4.1: O sistema exibe "Ainda não entregamos no CEP 20040-002. Você pode retirar na loja sem custo (Rua das Confeitarias, 123)."
+- Delta4.2: O caso de uso termina.
+
+---
+
+### UC14 — Manter zonas de entrega
+
+**Nome:** Manter zonas de entrega
+**Identificador:** UC14
+**Descrição:** A administradora cadastra e edita as zonas onde a loja entrega, com faixa de CEP, valor do frete, prazo e valor mínimo opcional para frete grátis.
+**Atores:** Administrador.
+**Pré-condições:** usuário autenticado com papel ADMIN.
+**Pós-condições:** zona gravada; a cotação de frete (UC13) e o checkout (UC06) passam a usá-la imediatamente.
+
+**Curso básico de ação:**
+1. O caso de uso começa quando a administradora acessa **Painel → Frete** (TELA-16 – Zonas de entrega).
+2. O sistema lista as zonas com faixa de CEP, frete, "grátis a partir de", prazo e situação.
+3. A administradora clica em "+ Nova zona" ou em "Editar" (TELA-17 – Formulário de zona).
+4. A administradora informa nome, CEP inicial, CEP final, frete (R$), grátis a partir de (R$, opcional), prazo em horas e se a zona está ativa, e clica em "Salvar".
+5. O sistema valida os dados: CEPs com 8 dígitos, CEP final ≥ CEP inicial, frete ≥ 0, prazo ≥ 1 hora (RN02). <Curso alternativo Alfa>
+6. O sistema grava a zona e volta para a TELA-16 com o aviso "Zona cadastrada" ou "Zona atualizada".
+7. O caso de uso termina.
+
+**Curso alternativo Alfa:** dados inválidos.
+- Alfa5.1: O sistema exibe a mensagem no campo (ex.: "Deve ser maior ou igual ao CEP inicial.", "Informe um valor válido, ex.: 9,90").
+- Alfa5.2: O caso de uso volta ao passo 4.
+
+**Curso alternativo Beta:** usuário sem permissão.
+- Beta1.1: Um cliente que acessa /admin/frete é redirecionado para a vitrine; uma chamada direta à API recebe 403 SEM_PERMISSAO.

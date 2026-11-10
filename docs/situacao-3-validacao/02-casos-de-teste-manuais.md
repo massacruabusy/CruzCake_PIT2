@@ -13,7 +13,7 @@ Roteiro ponta a ponta executado no navegador, que corresponde ao nível **Teste 
 | Administrador | `admin@cruzcake.com.br` / `Admin1234` |
 | Cartão aprovado | `4111 1111 1111 1111`, validade `12/30`, CVV `123`, nome `CLIENTE TESTE` |
 | Cartão recusado | `4000 0000 0002 0000`, validade `12/30`, CVV `123` |
-| CEP | `01310-100`, número `1000` |
+| CEPs | `01310-100` (Centro expandido: R$ 9,90, grátis a partir de R$ 120, até 2 h), número `1000` · `08010-000` (Zona Leste: R$ 14,90, grátis a partir de R$ 180, até 3 h) · `20040-002` (fora da área) · `99999-999` (inexistente) |
 | Cupons | `BEMVINDO10` (10%, mín. R$ 30,00) · `DOCE5` (R$ 5,00, mín. R$ 40,00) · `NATAL2025` (vencido) |
 | Estoque especial | *Frutas Vermelhas* = 4 un. · *Coco e Maracujá (sem glúten)* = 0 (esgotado) · *Café com Avelã* = inativo |
 
@@ -31,7 +31,7 @@ Roteiro ponta a ponta executado no navegador, que corresponde ao nível **Teste 
 | CT-06 | Frete: entrega, frete grátis e retirada | TELA-03, TELA-06 | RN01, RN02 | Pendente |
 | CT-07 | Cupom vencido | TELA-03 | RN05 | Pendente |
 | CT-08 | Cupom abaixo do valor mínimo | TELA-03 | RN05 | Pendente |
-| CT-09 | Produto esgotado | TELA-01, TELA-02 | RN03 | Pendente |
+| CT-09 | Produto esgotado | TELA-01, TELA-02 | RN03, RN09 | Pendente |
 | CT-10 | Quantidade acima do estoque | TELA-02, TELA-03 | RN03, RN04 | Pendente |
 | CT-11 | Validação do endereço de entrega | TELA-06 | — | Pendente |
 | CT-12 | Compra com PIX e confirmação | TELA-06, TELA-07 | RN06, RN07 | Pendente |
@@ -45,6 +45,14 @@ Roteiro ponta a ponta executado no navegador, que corresponde ao nível **Teste 
 | CT-20 | Responsividade em celular | Todas | — | Pendente |
 | CT-21 | Navegação somente por teclado | TELA-01, TELA-03, TELA-06 | — | Pendente |
 | CT-22 | Página inexistente (404) | — | — | Pendente |
+| CT-23 | Cotar frete de CEP atendido (visitante) | TELA-02, TELA-03 | RN02 | Pendente |
+| CT-24 | CEP fora da área de entrega | TELA-02, TELA-06 | RN02 | Pendente |
+| CT-25 | CEP inexistente na cotação | TELA-02 | — | Pendente |
+| CT-26 | Admin cria zona de entrega e ela passa a valer | TELA-16, TELA-17, TELA-02 | RN02 | Pendente |
+| CT-27 | Zona com faixa de CEP invertida | TELA-17 | RN02 | Pendente |
+| CT-28 | Esgotado oculto na vitrine e na busca | TELA-01, TELA-02 | RN09 | Pendente |
+| CT-29 | Minicarrinho abre ao adicionar e fecha com Esc | Minicarrinho | RN04 | Pendente |
+| CT-30 | Kits identificáveis na vitrine | TELA-01, TELA-02 | — | Pendente |
 
 ---
 
@@ -108,8 +116,8 @@ Roteiro ponta a ponta executado no navegador, que corresponde ao nível **Teste 
 | Campo | Conteúdo |
 |---|---|
 | **Pré-condição** | Logado como cliente, carrinho vazio |
-| **Passos** | 1. Adicionar 1× Chocolate Belga (R$ 11,00) e ver o resumo no carrinho. 2. Adicionar 1× Caixa Degustação e 1× Kit Festa (subtotal ≥ R$ 120,00). 3. No checkout, alternar entre **Entrega** e **Retirar na loja**. |
-| **Resultado esperado** | Passo 1: frete R$ 9,90. Passo 2: frete "Grátis". Passo 3: na retirada o frete é "Grátis" e os campos de endereço somem. O total sempre é igual a subtotal − desconto + frete (RN01, RN02). |
+| **Passos** | 1. Adicionar 1× Chocolate Belga (R$ 11,00), abrir o carrinho e ver o resumo sem CEP. 2. Calcular o frete para `01310-100`. 3. Adicionar 1× Caixa Degustação e 1× Kit Festa (subtotal ≥ R$ 120,00). 4. No checkout, alternar entre **Entrega** e **Retirar na loja**. |
+| **Resultado esperado** | Passo 1: frete "Informe o CEP" e "Total sem frete". Passo 2: frete R$ 9,90 (Centro expandido). Passo 3: frete "Grátis". Passo 4: na retirada o frete é "Grátis" e os campos de endereço somem. O total sempre é igual a subtotal − desconto + frete (RN01, RN02). |
 | **Resultado obtido** | |
 | **Status** | Pendente |
 | **Evidência** | |
@@ -141,8 +149,8 @@ Roteiro ponta a ponta executado no navegador, que corresponde ao nível **Teste 
 | Campo | Conteúdo |
 |---|---|
 | **Pré-condição** | Nenhuma |
-| **Passos** | 1. Na vitrine, localizar *Coco e Maracujá (sem glúten)*. 2. Abrir a página do produto. |
-| **Resultado esperado** | O botão aparece como **Esgotado**, desabilitado, e não é possível adicionar ao carrinho. A página de detalhe mostra "Esgotado hoje — volte amanhã!" (RN03). |
+| **Passos** | 1. Na vitrine, procurar *Coco e Maracujá (sem glúten)*. 2. Abrir diretamente `/produto/coco-maracuja-sem-gluten`. |
+| **Resultado esperado** | Passo 1: o produto **não aparece** na vitrine (RN09 revisada). Passo 2: a página abre, mostra "Esgotado hoje — volte amanhã!" e o botão **Esgotado** desabilitado; não é possível adicionar ao carrinho (RN03). |
 | **Resultado obtido** | |
 | **Status** | Pendente |
 | **Evidência** | |
@@ -289,3 +297,92 @@ Roteiro ponta a ponta executado no navegador, que corresponde ao nível **Teste 
 | **Resultado obtido** | |
 | **Status** | Pendente |
 | **Evidência** | |
+
+## CT-23 — Cotar frete de CEP atendido (visitante)
+
+| Campo | Conteúdo |
+|---|---|
+| **Pré-condição** | Visitante sem login, carrinho vazio |
+| **Passos** | 1. Abrir `/produto/caixa-degustacao-6`. 2. Em **Entregamos no seu endereço?**, digitar `08010-000` e clicar em **Calcular**. 3. Adicionar o produto e abrir o carrinho. |
+| **Resultado esperado** | Passo 2: "📍 Rua Serra Dourada, São Miguel Paulista · São Paulo/SP" e "Entregamos! Zona Leste (SP): em até 3h após o preparo, por R$ 14,90 · grátis a partir de R$ 180,00." Passo 3: o carrinho já mostra o CEP calculado e o frete R$ 14,90 no resumo, sem digitar de novo (RN02). |
+| **Resultado obtido** | |
+| **Status** | Pendente |
+| **Evidência** | |
+
+## CT-24 — CEP fora da área de entrega
+
+| Campo | Conteúdo |
+|---|---|
+| **Pré-condição** | Logado como cliente, carrinho com 1 item |
+| **Passos** | 1. Na página de um produto, calcular o frete para `20040-002`. 2. No checkout, escolher **Entrega** → **Usar outro endereço** e informar o CEP `20040-002`, número `100`. 3. Clicar em **Mudar para retirada na loja** (ou escolher Retirar na loja). |
+| **Resultado esperado** | Passo 1: "Ainda não entregamos no CEP 20040-002. Você pode retirar na loja sem custo". Passo 2: aviso "Ainda não entregamos neste CEP. Escolha Retirar na loja ou use outro endereço." e o botão de confirmar fica desabilitado; nenhum pedido é criado. Passo 3: com retirada, o pedido pode ser concluído normalmente (RN02). |
+| **Resultado obtido** | |
+| **Status** | Pendente |
+| **Evidência** | |
+
+## CT-25 — CEP inexistente na cotação
+
+| Campo | Conteúdo |
+|---|---|
+| **Pré-condição** | Nenhuma |
+| **Passos** | 1. Na página de um produto, calcular o frete para `99999-999`. 2. Calcular para `123`. |
+| **Resultado esperado** | Passo 1: "CEP não encontrado. Confira os números." Passo 2: "Digite os 8 números do CEP." Nenhuma cotação é exibida. |
+| **Resultado obtido** | |
+| **Status** | Pendente |
+| **Evidência** | |
+
+## CT-26 — Admin cria zona de entrega e ela passa a valer
+
+| Campo | Conteúdo |
+|---|---|
+| **Pré-condição** | Logado como administrador |
+| **Passos** | 1. **Painel → Frete → + Nova zona**. 2. Nome `Rio Centro`, CEP inicial `20000-000`, CEP final `20999-999`, frete `25,00`, grátis a partir de (em branco), prazo `24`, ativa → **Salvar**. 3. Em outra aba (visitante), calcular o frete para `20040-002`. |
+| **Resultado esperado** | Passo 2: aviso "Zona cadastrada" e a zona aparece na lista com "—" em "Grátis a partir de". Passo 3: "Entregamos! Rio Centro: em até 24h após o preparo, por R$ 25,00." (RN02). Ao final, desativar ou editar a zona para não afetar outros testes. |
+| **Resultado obtido** | |
+| **Status** | Pendente |
+| **Evidência** | |
+
+## CT-27 — Zona com faixa de CEP invertida
+
+| Campo | Conteúdo |
+|---|---|
+| **Pré-condição** | Logado como administrador |
+| **Passos** | 1. **Painel → Frete → + Nova zona**. 2. CEP inicial `04999-999`, CEP final `04000-000`, frete `12,90`, prazo `2` → **Salvar**. 3. Repetir com frete `abc`. |
+| **Resultado esperado** | Passo 2: mensagem "Deve ser maior ou igual ao CEP inicial." no CEP final; nada é gravado. Passo 3: "Informe um valor válido, ex.: 9,90 (use 0 para frete grátis)." |
+| **Resultado obtido** | |
+| **Status** | Pendente |
+| **Evidência** | |
+
+## CT-28 — Esgotado oculto na vitrine e na busca
+
+| Campo | Conteúdo |
+|---|---|
+| **Pré-condição** | Logado como administrador em uma aba e visitante em outra |
+| **Passos** | 1. Visitante: buscar "maracujá". 2. Admin: editar *Coco e Maracujá* e colocar estoque `5`. 3. Visitante: recarregar a vitrine e buscar de novo. 4. Admin: voltar o estoque para `0`. |
+| **Resultado esperado** | Passo 1: "Nenhum cupcake encontrado". Passo 3: o produto aparece (com selo "Últimas 5"). Passo 4: some de novo da vitrine (RN09). |
+| **Resultado obtido** | |
+| **Status** | Pendente |
+| **Evidência** | |
+
+## CT-29 — Minicarrinho abre ao adicionar e fecha com Esc
+
+| Campo | Conteúdo |
+|---|---|
+| **Pré-condição** | Visitante, carrinho vazio, teclado disponível |
+| **Passos** | 1. Na vitrine, clicar em **Adicionar** em um produto. 2. No minicarrinho, usar **+**, **−** e **Remover**. 3. Adicionar outro produto e apertar **Esc**. 4. Clicar no ícone do carrinho no topo e depois em **Ver carrinho e finalizar**. |
+| **Resultado esperado** | Passo 1: a gaveta "Seu carrinho (1)" abre com o item e o foco vai para o botão ×. Passo 2: subtotal e contador do cabeçalho atualizam na hora. Passo 3: a gaveta fecha e a página continua no mesmo lugar. Passo 4: a gaveta abre pelo ícone e o botão leva para `/carrinho`. |
+| **Resultado obtido** | |
+| **Status** | Pendente |
+| **Evidência** | |
+
+## CT-30 — Kits identificáveis na vitrine
+
+| Campo | Conteúdo |
+|---|---|
+| **Pré-condição** | Celular (390 px) ou DevTools em modo celular |
+| **Passos** | 1. Abrir a vitrine. 2. Observar a barra de categorias e os cards de *Caixa Degustação* e *Kit Festa*. 3. Abrir a Caixa Degustação. |
+| **Resultado esperado** | Passo 2: "Caixas e kits" é o 2º filtro e aparece sem rolar a barra; os cards mostram a caixa com os cupcakes ("CAIXA COM 6", "KIT FESTA · 12 MINIS") e o selo "📦 Kit para presentear". Passo 3: a imagem grande deixa claro o conteúdo da caixa. |
+| **Resultado obtido** | |
+| **Status** | Pendente |
+| **Evidência** | |
+

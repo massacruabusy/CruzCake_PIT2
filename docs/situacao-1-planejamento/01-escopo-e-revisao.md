@@ -12,24 +12,25 @@ A **CruzCake Cupcakes** é uma confeitaria de cupcakes gourmet com loja física 
 
 | Persona | Quem é | O que espera do sistema |
 |---|---|---|
-| **Visitante** | Pessoa que chegou pelo Instagram ou Google | Ver o cardápio, preços e fotos sem precisar criar conta |
-| **Cliente** | Comprador cadastrado (presente, festa, consumo próprio) | Comprar em poucos passos, saber o total antes de pagar e acompanhar o pedido |
-| **Administradora (dona/confeiteira)** | Responsável pela produção e pelo atendimento | Cadastrar sabores, controlar estoque do dia e avançar o status dos pedidos |
-| **Atendente** | Funcionária do balcão | Consultar pedidos de retirada e confirmar entregas |
-| **Sistemas externos** | Gateway de pagamento (simulado) e ViaCEP | Autorizar pagamentos e completar endereços pelo CEP |
+| **Visitante** | Pessoa que chegou pelo Instagram ou Google e ainda não tem conta | Ver o cardápio, preços e fotos e saber se a loja entrega no seu CEP (valor e prazo) sem criar conta |
+| **Cliente** | Comprador recorrente (presente, festa, consumo próprio) | Comprar em poucos passos, conferir o carrinho sem sair da página, saber o total antes de pagar e acompanhar o pedido |
+| **Administradora da loja (dona/confeiteira e balcão)** | Responsável pela produção, atendimento e entregas | Cadastrar sabores, controlar estoque do dia, definir zonas e valores de frete e avançar o status dos pedidos |
+| **Sistemas externos** | Gateway de pagamento (simulado) e serviço de CEP (ViaCEP, com BrasilAPI de reserva) | Autorizar pagamentos e completar endereços pelo CEP |
+
+Os três papéis de usuário (Visitante, Cliente e Administradora) são também os papéis que os testadores assumem na validação (Situação 3).
 
 ## 1.3 Escopo do MVP (o que foi construído)
 
 | Módulo | Funcionalidades |
 |---|---|
-| Vitrine | Cardápio por categoria, busca, destaques, selo "últimas unidades", página do produto com ingredientes/alérgenos |
-| Carrinho | Adicionar/alterar/remover itens, persistência no navegador, preços e estoque recalculados no servidor, cupom de desconto, estimativa de frete |
+| Vitrine | Cardápio por categoria (com "Caixas e kits" em destaque), busca, destaques, selo "últimas unidades", esgotados ocultos, página do produto com ingredientes/alérgenos e **cotação de frete pelo CEP** |
+| Carrinho | **Minicarrinho** lateral, adicionar/alterar/remover itens, persistência no navegador, preços e estoque recalculados no servidor, cupom de desconto, frete calculado pelo CEP |
 | Conta | Cadastro, login e logout com sessão segura, endereços salvos |
-| Checkout | Entrega ou retirada na loja, endereço com preenchimento automático pelo CEP, pagamento com PIX ou cartão (**simulados**), observações |
+| Checkout | Entrega ou retirada na loja, endereço com preenchimento automático pelo CEP, frete e prazo da zona de entrega (CEP fora da área só permite retirada), pagamento com PIX ou cartão (**simulados**), observações |
 | Pós-venda | Confirmação do pedido, "Meus pedidos", linha do tempo do status, cancelamento antes do preparo |
-| Administração | Painel com indicadores e estoque baixo, cadastro/edição de produtos, lista de pedidos por situação, avanço de status com regras |
+| Administração | Painel com indicadores e estoque baixo, cadastro/edição de produtos, **zonas de entrega e frete**, lista de pedidos por situação, avanço de status com regras |
 
-**Fora do escopo do MVP** (ficou no backlog, ver `02-historias-de-usuario.md`): gateway de pagamento real, recuperação de senha por e-mail, avaliações de produtos, agendamento de entrega por janela de horário, notificações por WhatsApp/e-mail, programa de fidelidade e encomendas personalizadas.
+**Fora do escopo do MVP** (ficou no backlog, ver `02-historias-de-usuario.md`): gateway de pagamento real, recuperação de senha por e-mail, avaliações de produtos, agendamento de entrega por janela de horário, notificações por WhatsApp/e-mail, programa de fidelidade, encomendas personalizadas e preço promocional programado.
 
 ## 1.4 Revisão do planejamento do PIT I
 
@@ -52,19 +53,33 @@ No PIT I o trabalho registrou o processo de imersão e o backlog inicial (≈ 30
 5. **Máquina de estados do pedido (RN07)**, que impede, por exemplo, marcar como "Entregue" um pedido ainda não preparado.
 6. **Retirada na loja** incluída a partir do feedback da cliente: reduz o custo para o comprador e aproveita o fluxo da loja física.
 
+### Evoluções incorporadas
+
+Na segunda volta do ciclo Kaizen, o backlog foi revisto com base em situações comuns de e-commerce e cresceu para 38 histórias (108 pontos). Foram implementadas:
+
+| Evolução | História | O que mudou |
+|---|---|---|
+| Cotação de frete pelo CEP antes da compra | US33 | Visitante informa o CEP no produto ou no carrinho e vê endereço, zona, valor e prazo, ou a mensagem de que a loja ainda não entrega ali |
+| Zonas de entrega geridas pela loja | US34 | O frete fixo deu lugar a zonas por faixa de CEP (valor, prazo, frete grátis opcional), editáveis no painel (RN02 revisada) |
+| Vitrine só com o que dá para comprar | US35 | Esgotados saem da vitrine e da busca (RN09 revisada) |
+| Kits visíveis | US36 | Arte mostrando a caixa com os cupcakes, selo "Kit para presentear" e categoria em 2º lugar nos filtros |
+| Minicarrinho | US37 | Gaveta lateral para conferir e ajustar o carrinho sem sair da página |
+
+**Decisão sobre promoções:** não foi criado um módulo de promoções nesta versão. Por ora, a loja faz promoção **alterando o preço do produto no painel** e usa **cupons**. Agendar preço promocional com início e fim ficou no backlog (US38).
+
 ## 1.5 Regras de negócio consolidadas
 
 | ID | Regra |
 |---|---|
 | RN01 | Valores em centavos; total = subtotal − desconto + frete |
-| RN02 | Frete fixo de R$ 9,90 para entrega; grátis quando os produtos (já com desconto) somam R$ 120,00 ou mais; retirada não paga frete |
+| RN02 | Frete por zona de entrega cadastrada pela loja (faixa de CEP, valor, prazo e mínimo opcional para frete grátis, avaliado sobre o subtotal já com desconto). Havendo sobreposição, vale a faixa mais específica. CEP fora das zonas ativas não recebe entrega, só retirada. Retirada não paga frete |
 | RN03 | Não é possível vender acima do estoque; o estoque é baixado ao criar o pedido e devolvido ao cancelar |
 | RN04 | Máximo de 24 unidades do mesmo produto por pedido |
 | RN05 | Cupom precisa existir, estar ativo, dentro da validade e atingir o valor mínimo; o desconto nunca passa do subtotal |
 | RN06 | Pagamento simulado: cartão validado (Luhn, validade e CVV), cartões terminados em 0000 são recusados; PIX gera código e aguarda confirmação |
 | RN07 | Status seguem o fluxo: Aguardando pagamento → Pago → Em preparo → Saiu para entrega / Pronto para retirada → Entregue (cancelamento possível até o preparo) |
 | RN08 | O cliente só pode cancelar o próprio pedido antes de ele entrar em preparo |
-| RN09 | Apenas produtos ativos aparecem na vitrine |
+| RN09 | Vitrine e busca mostram apenas produtos ativos e com estoque; a página direta do produto esgotado informa "Esgotado hoje" |
 | RN10 | Senha com no mínimo 8 caracteres, contendo letras e números |
 
 ## 1.6 Requisitos não funcionais

@@ -14,6 +14,7 @@ Transcrição das respostas recebidas pelo [formulário de teste](03-formulario-
 | Campo | Resposta |
 |---|---|
 | **Nome** | [preencher] |
+| **Papel assumido** | [Visitante / Cliente / Administradora da loja] |
 | **Data do teste** | [preencher] |
 | Perfil / dispositivo / navegador | [preencher] |
 | **O que testou e funcionou** | [preencher] |
@@ -32,6 +33,7 @@ Transcrição das respostas recebidas pelo [formulário de teste](03-formulario-
 | Campo | Resposta |
 |---|---|
 | **Nome** | [preencher] |
+| **Papel assumido** | [Visitante / Cliente / Administradora da loja] |
 | **Data do teste** | [preencher] |
 | Perfil / dispositivo / navegador | [preencher] |
 | **O que testou e funcionou** | [preencher] |
@@ -50,6 +52,7 @@ Transcrição das respostas recebidas pelo [formulário de teste](03-formulario-
 | Campo | Resposta |
 |---|---|
 | **Nome** | [preencher] |
+| **Papel assumido** | [Visitante / Cliente / Administradora da loja] |
 | **Data do teste** | [preencher] |
 | Perfil / dispositivo / navegador | [preencher] |
 | **O que testou e funcionou** | [preencher] |
@@ -68,6 +71,7 @@ Transcrição das respostas recebidas pelo [formulário de teste](03-formulario-
 | Campo | Resposta |
 |---|---|
 | **Nome** | [preencher] |
+| **Papel assumido** | [Visitante / Cliente / Administradora da loja] |
 | **Data do teste** | [preencher] |
 | Perfil / dispositivo / navegador | [preencher] |
 | **O que testou e funcionou** | [preencher] |
@@ -86,6 +90,7 @@ Transcrição das respostas recebidas pelo [formulário de teste](03-formulario-
 | Campo | Resposta |
 |---|---|
 | **Nome** | [preencher] |
+| **Papel assumido** | [Visitante / Cliente / Administradora da loja] |
 | **Data do teste** | [preencher] |
 | Perfil / dispositivo / navegador | [preencher] |
 | **O que testou e funcionou** | [preencher] |

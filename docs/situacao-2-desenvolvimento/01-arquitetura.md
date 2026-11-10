@@ -53,11 +53,11 @@ src/
 │   ├── entrar/, cadastro/    # TELA-04/05
 │   ├── checkout/             # TELA-06
 │   ├── pedidos/              # TELA-07/08
-│   ├── admin/                # TELA-09 a 13 (protegido por papel ADMIN)
-│   ├── api/                  # REST: auth, produtos, carrinho, pedidos, admin
+│   ├── admin/                # TELA-09 a 13, 16 e 17 (protegido por papel ADMIN)
+│   ├── api/                  # REST: auth, produtos, carrinho, frete, cep, pedidos, admin
 │   ├── not-found.tsx         # TELA-14
 │   └── error.tsx             # TELA-15
-├── components/               # VIEW: componentes reutilizáveis
+├── components/               # VIEW: componentes reutilizáveis (MiniCarrinho, CotacaoFrete, Logo…)
 ├── controllers/              # CONTROLLER
 │   ├── validacoes.ts         # contratos de entrada (Zod)
 │   ├── http.ts               # erros padronizados, exigirSessao/exigirAdmin
@@ -66,7 +66,8 @@ src/
 │   ├── db/schema.ts          # entidades e restrições (fonte do modelo físico)
 │   ├── db/client.ts          # conexão PostgreSQL/PGlite
 │   ├── regras/               # regras de negócio puras (testes unitários)
-│   ├── services/             # casos de uso com banco (testes de integração)
+│   ├── services/             # casos de uso com banco (testes de integração); frete.service (zonas e cotação),
+│   │                         # cep.service (ViaCEP com BrasilAPI de reserva)
 │   └── erros.ts
 └── lib/                      # infraestrutura: sessão (JWT) e cliente HTTP do navegador
 database/                     # migrações, seed, setup e dicionário de dados
@@ -80,8 +81,10 @@ tests/                        # unit/ e integration/
 | POST | `/api/auth/cadastro` | público | Cria conta e já inicia sessão |
 | POST | `/api/auth/entrar` | público | Login |
 | POST | `/api/auth/sair` | público | Logout |
-| GET | `/api/produtos?categoria=&busca=` | público | Vitrine (categorias + produtos ativos) |
-| POST | `/api/carrinho/precificar` | público | Preço, estoque, cupom e frete oficiais do carrinho |
+| GET | `/api/produtos?categoria=&busca=` | público | Vitrine (categorias + produtos ativos com estoque) |
+| GET | `/api/frete?cep=&base=` | público | Cotação de frete pelo CEP: zona, prazo, valor (sobre `base` em centavos) e endereço |
+| GET | `/api/cep/{cep}` | público | Endereço do CEP para preencher o checkout (ViaCEP, reserva BrasilAPI) |
+| POST | `/api/carrinho/precificar` | público | Preço, estoque, cupom e frete (pela zona do `cep` informado) oficiais do carrinho |
 | GET | `/api/pedidos` | cliente | Meus pedidos |
 | POST | `/api/pedidos` | cliente | Finalizar compra |
 | GET | `/api/pedidos/{id}` | dono ou admin | Detalhe do pedido |
@@ -91,6 +94,8 @@ tests/                        # unit/ e integration/
 | PUT | `/api/admin/produtos/{id}` | admin | Edita produto |
 | GET | `/api/admin/pedidos?status=` | admin | Lista pedidos |
 | PATCH | `/api/admin/pedidos/{id}/status` | admin | Avança status (RN07) |
+| GET/POST | `/api/admin/zonas-entrega` | admin | Lista / cria zona de entrega (RN02) |
+| PUT | `/api/admin/zonas-entrega/{id}` | admin | Edita zona de entrega |
 
 Erros: `{ "erro": { "codigo": "ESTOQUE_INSUFICIENTE", "mensagem": "…", "campos": { … } } }` (catálogo em `docs/situacao-1-planejamento/06-ihc.md`).
 
@@ -106,6 +111,8 @@ Erros: `{ "erro": { "codigo": "ESTOQUE_INSUFICIENTE", "mensagem": "…", "campos
 | ADR-06 | Carrinho no navegador, preço no servidor | Carrinho persistido no banco | Visitante monta o carrinho sem login; segurança garantida porque o total é sempre recalculado no servidor |
 | ADR-07 | Pagamento simulado isolado em `regras/pagamento.ts` | Integrar sandbox de gateway | Projeto acadêmico; a interface isolada permite trocar pelo gateway real sem mudar o resto do sistema |
 | ADR-08 | Sessão JWT em cookie `httpOnly` | NextAuth, sessão em banco | Simples, sem dependência externa; o cookie não é acessível por JavaScript (mitiga XSS) |
+| ADR-09 | Endereço por CEP via **ViaCEP** com **BrasilAPI** de reserva, consultados pelo servidor (`cep.service.ts`, tempo limite de 3,5 s) | API oficial dos Correios (CWS); chamar o ViaCEP direto do navegador | A API dos Correios exige contrato e credenciais; ViaCEP e BrasilAPI espelham a base de CEPs dos Correios e são gratuitos. Consultar pelo servidor permite trocar de provedor sem mexer no front e ter reserva automática. Se os dois falharem, a cotação de frete continua (só sem o endereço) e o checkout permite digitar o endereço |
+| ADR-10 | Frete por **zonas de faixa de CEP** cadastradas pela loja, com regra "faixa mais específica vence" | Frete fixo; integrar cálculo de transportadora (Correios/Melhor Envio) | Entrega própria por bairro/região é o modelo de uma confeitaria local; faixas de CEP são simples de manter no painel; sobreposição permite exceções (ex.: um bairro com valor diferente dentro da Grande SP) |
 
 ## Segurança
 

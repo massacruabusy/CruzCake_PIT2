@@ -11,7 +11,7 @@ Revisite a documentação do projeto desenvolvido na PIT I, faça as atualizaç�
 
 **Link do repositório:** `https://github.com/[seu-usuario]/[nome-do-repo]` (documentação em `/docs`, separada por situação-problema)
 
-Resumo das melhorias (opcional, se houver espaço): planejamento revisado com as decisões que estavam em aberto no PIT I (plataforma, tecnologia, estoque e pagamentos); 32 histórias de usuário no template completo (91 pontos); backlog priorizado com tarefas; casos de uso expandidos; diagramas de classes, sequência, atividades e estados; IHC com mapas conceitual e navegacional, wireframes e mockups; modelagem conceitual, lógica normalizada e física (PostgreSQL) com dicionário de dados.
+Resumo das melhorias (opcional, se houver espaço): planejamento revisado com as decisões que estavam em aberto no PIT I (plataforma, tecnologia, estoque e pagamentos); 38 histórias de usuário no template completo (108 pontos), incluindo evoluções da revisão Kaizen (frete por CEP com zonas de entrega, minicarrinho, kits em destaque, vitrine sem esgotados); backlog priorizado com tarefas; casos de uso expandidos; diagramas de classes, sequência, atividades e estados; IHC com mapas conceitual e navegacional, wireframes e mockups; modelagem conceitual, lógica normalizada e física (PostgreSQL) com dicionário de dados.
 
 ## Codificação
 
