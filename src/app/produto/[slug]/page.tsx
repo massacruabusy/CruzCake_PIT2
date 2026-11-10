@@ -5,7 +5,7 @@ import { detalheProduto } from "@/controllers/loja.controller";
 import { BotaoAdicionar } from "@/components/BotaoAdicionar";
 import { ErroNegocio } from "@/models/erros";
 import { formatarCentavos } from "@/models/regras/dinheiro";
-import { FRETE_GRATIS_A_PARTIR_CENTAVOS } from "@/models/regras/pedido";
+import { CotacaoFrete } from "@/components/CotacaoFrete";
 
 async function carregar(slug: string) {
   try {
@@ -55,10 +55,7 @@ export default async function PaginaProduto(props: PageProps<"/produto/[slug]">)
             {p.estoque === 0 ? "Esgotado hoje — volte amanhã!" : p.estoque <= 5 ? `Últimas ${p.estoque} unidades` : "Disponível para hoje"}
           </p>
           <BotaoAdicionar produto={p} comQuantidade />
-          <ul className="text-sm text-stone-600">
-            <li>🚚 Frete grátis a partir de {formatarCentavos(FRETE_GRATIS_A_PARTIR_CENTAVOS)}</li>
-            <li>🏪 Retirada na loja sem custo</li>
-          </ul>
+          <CotacaoFrete />
         </div>
       </div>
     </div>

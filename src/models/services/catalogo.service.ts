@@ -1,5 +1,5 @@
 /** MODEL — Vitrine: categorias e produtos visíveis ao cliente. */
-import { and, asc, desc, eq, ilike, or, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, gt, ilike, or, type SQL } from "drizzle-orm";
 import type { DB } from "../db/client";
 import { categorias, produtos } from "../db/schema";
 import { ErroNegocio } from "../erros";
@@ -13,9 +13,13 @@ export interface FiltroVitrine {
   busca?: string;
 }
 
-/** RN09 — Apenas produtos ativos aparecem na vitrine; destaques primeiro. */
+/**
+ * RN09 — Na vitrine e na busca aparecem apenas produtos ativos e com estoque (cupcake é produção do dia:
+ * esgotado não deve ocupar espaço na vitrine). Destaques primeiro. A página direta do produto continua
+ * acessível e informa "Esgotado hoje".
+ */
 export async function listarProdutosVitrine(db: DB, filtro: FiltroVitrine = {}) {
-  const condicoes: SQL[] = [eq(produtos.ativo, true)];
+  const condicoes: SQL[] = [eq(produtos.ativo, true), gt(produtos.estoque, 0)];
   if (filtro.categoriaSlug) condicoes.push(eq(categorias.slug, filtro.categoriaSlug));
   if (filtro.busca?.trim()) {
     const termo = `%${filtro.busca.trim()}%`;

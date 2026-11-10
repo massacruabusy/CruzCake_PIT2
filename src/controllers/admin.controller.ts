@@ -12,7 +12,8 @@ import {
 } from "@/models/services/admin.service";
 import { listarCategorias } from "@/models/services/catalogo.service";
 import { mudarStatusPedido, obterPedido } from "@/models/services/pedido.service";
-import { mudarStatusSchema, produtoSchema } from "./validacoes";
+import { atualizarZona, criarZona, listarZonas, obterZona } from "@/models/services/frete.service";
+import { mudarStatusSchema, produtoSchema, zonaSchema } from "./validacoes";
 import { exigirAdmin, validar } from "./http";
 
 const STATUS_VALIDOS = mudarStatusSchema.shape.status.options;
@@ -67,4 +68,24 @@ export async function alterarStatusPedido(id: string, corpo: unknown) {
   const { status, observacao } = validar(mudarStatusSchema, corpo);
   const p = await mudarStatusPedido(await getDb(), idValido(id, "Pedido"), status, observacao ?? undefined);
   return { pedidoId: p.id, status: p.status };
+}
+
+export async function zonas() {
+  await exigirAdmin();
+  return listarZonas(await getDb());
+}
+
+export async function zona(id: string) {
+  await exigirAdmin();
+  return obterZona(await getDb(), idValido(id, "Zona"));
+}
+
+export async function novaZona(corpo: unknown) {
+  await exigirAdmin();
+  return criarZona(await getDb(), validar(zonaSchema, corpo));
+}
+
+export async function editarZona(id: string, corpo: unknown) {
+  await exigirAdmin();
+  return atualizarZona(await getDb(), idValido(id, "Zona"), validar(zonaSchema, corpo));
 }

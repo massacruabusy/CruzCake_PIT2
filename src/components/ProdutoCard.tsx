@@ -20,6 +20,9 @@ export function ProdutoCard({ produto }: { produto: ProdutoVitrine }) {
           {produto.destaque && (
             <span className="absolute left-2 top-2 rounded-full bg-estrela-500 px-2 py-0.5 text-xs font-bold text-marca-900">★ Destaque</span>
           )}
+          {produto.categoriaSlug === "caixas-e-kits" && (
+            <span className="absolute bottom-2 left-2 rounded-full bg-marca-700 px-2 py-0.5 text-xs font-bold text-white">📦 Kit para presentear</span>
+          )}
           {produto.estoque > 0 && produto.estoque <= 5 && (
             <span className="absolute right-2 top-2 rounded-full bg-amber-500 px-2 py-0.5 text-xs font-bold text-white">
               Últimas {produto.estoque}

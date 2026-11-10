@@ -4,7 +4,7 @@ import {
   calcularFrete,
   calcularTotais,
   clientePodeCancelar,
-  FRETE_FIXO_CENTAVOS,
+  encontrarZona,
   proximosStatusPossiveis,
   validarTransicao,
 } from "@/models/regras/pedido";
@@ -19,15 +19,33 @@ const cupomBase = {
   ativo: true,
 };
 
-describe("RN02 — frete", () => {
-  it("retirada na loja não cobra frete", () => {
-    expect(calcularFrete("RETIRADA", 500)).toBe(0);
+const zonaBase = { ativo: true, freteGratisAPartirCentavos: 12000 as number | null, prazoHoras: 2 };
+const ZONAS = [
+  { ...zonaBase, id: 1, nome: "Centro", cepInicial: "01000000", cepFinal: "05999999", valorCentavos: 990 },
+  { ...zonaBase, id: 2, nome: "Leste", cepInicial: "08000000", cepFinal: "08499999", valorCentavos: 1490, freteGratisAPartirCentavos: 18000 },
+  { ...zonaBase, id: 3, nome: "Grande SP", cepInicial: "06000000", cepFinal: "09999999", valorCentavos: 1990, freteGratisAPartirCentavos: null },
+  { ...zonaBase, id: 4, nome: "Inativa", cepInicial: "20000000", cepFinal: "20999999", valorCentavos: 500, ativo: false },
+];
+const FRETE_CENTRO = 990;
+
+describe("RN02 — frete por zona de entrega", () => {
+  it("encontra a zona que cobre o CEP (com ou sem hífen)", () => {
+    expect(encontrarZona(ZONAS, "01310-100")?.nome).toBe("Centro");
   });
-  it("entrega abaixo de R$ 120 cobra frete fixo", () => {
-    expect(calcularFrete("ENTREGA", 11999)).toBe(FRETE_FIXO_CENTAVOS);
+  it("com zonas sobrepostas vale a faixa mais específica", () => {
+    expect(encontrarZona(ZONAS, "08010000")?.nome).toBe("Leste");
+    expect(encontrarZona(ZONAS, "09010000")?.nome).toBe("Grande SP");
   });
-  it("entrega a partir de R$ 120 tem frete grátis", () => {
-    expect(calcularFrete("ENTREGA", 12000)).toBe(0);
+  it("CEP fora das zonas ou em zona inativa não tem entrega", () => {
+    expect(encontrarZona(ZONAS, "20040002")).toBeNull();
+    expect(encontrarZona(ZONAS, "123")).toBeNull();
+  });
+  it("cobra o valor da zona abaixo do mínimo e zera a partir dele", () => {
+    expect(calcularFrete(ZONAS[0], 11999)).toBe(990);
+    expect(calcularFrete(ZONAS[0], 12000)).toBe(0);
+  });
+  it("zona sem frete grátis sempre cobra", () => {
+    expect(calcularFrete(ZONAS[2], 999999)).toBe(1990);
   });
 });
 
@@ -58,16 +76,20 @@ describe("RN05 — cupom de desconto", () => {
 
 describe("RN01 — totais", () => {
   it("total = subtotal − desconto + frete", () => {
-    expect(calcularTotais(5000, 500, "ENTREGA")).toEqual({
+    expect(calcularTotais(5000, 500, "ENTREGA", ZONAS[0])).toEqual({
       subtotalCentavos: 5000,
       descontoCentavos: 500,
-      freteCentavos: FRETE_FIXO_CENTAVOS,
-      totalCentavos: 4500 + FRETE_FIXO_CENTAVOS,
+      freteCentavos: FRETE_CENTRO,
+      totalCentavos: 4500 + FRETE_CENTRO,
     });
   });
   it("frete grátis é avaliado depois do desconto", () => {
     // 125,00 − 10% = 112,50 → abaixo de 120, então paga frete
-    expect(calcularTotais(12500, 1250, "ENTREGA").freteCentavos).toBe(FRETE_FIXO_CENTAVOS);
+    expect(calcularTotais(12500, 1250, "ENTREGA", ZONAS[0]).freteCentavos).toBe(FRETE_CENTRO);
+  });
+  it("retirada na loja e entrega ainda sem CEP não somam frete", () => {
+    expect(calcularTotais(5000, 0, "RETIRADA", ZONAS[0]).freteCentavos).toBe(0);
+    expect(calcularTotais(5000, 0, "ENTREGA", null).freteCentavos).toBe(0);
   });
 });
 

@@ -9,13 +9,13 @@
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import type { DB } from "../src/models/db/client";
-import { categorias, cupons, produtos, usuarios } from "../src/models/db/schema";
+import { categorias, cupons, produtos, usuarios, zonasEntrega } from "../src/models/db/schema";
 
 const CATEGORIAS = [
   { nome: "Clássicos", slug: "classicos", ordem: 1 },
-  { nome: "Gourmet", slug: "gourmet", ordem: 2 },
-  { nome: "Veganos e sem glúten", slug: "veganos-sem-gluten", ordem: 3 },
-  { nome: "Caixas e kits", slug: "caixas-e-kits", ordem: 4 },
+  { nome: "Caixas e kits", slug: "caixas-e-kits", ordem: 2 },
+  { nome: "Gourmet", slug: "gourmet", ordem: 3 },
+  { nome: "Veganos e sem glúten", slug: "veganos-sem-gluten", ordem: 4 },
 ];
 
 type ProdutoSeed = {
@@ -78,12 +78,19 @@ export async function semearBanco(db: DB, opcoes: { log?: boolean } = {}) {
     { codigo: "NATAL2025", tipo: "PERCENTUAL", valor: 15, valorMinimoCentavos: 0, validoAte: new Date("2025-12-26T03:00:00Z") },
   ]);
 
+  // Zonas de entrega (RN02). O CEP 08000-000 a 08499-999 está nas duas últimas: vale a mais específica.
+  await db.insert(zonasEntrega).values([
+    { nome: "Centro expandido (SP)", cepInicial: "01000000", cepFinal: "05999999", valorCentavos: 990, freteGratisAPartirCentavos: 12000, prazoHoras: 2 },
+    { nome: "Zona Leste (SP)", cepInicial: "08000000", cepFinal: "08499999", valorCentavos: 1490, freteGratisAPartirCentavos: 18000, prazoHoras: 3 },
+    { nome: "Grande São Paulo", cepInicial: "06000000", cepFinal: "09999999", valorCentavos: 1990, freteGratisAPartirCentavos: null, prazoHoras: 4 },
+  ]);
+
   await db.insert(usuarios).values([
     { nome: "Administração CruzCake", email: "admin@cruzcake.com.br", senhaHash: await bcrypt.hash("Admin1234", 10), papel: "ADMIN" },
     { nome: "Cliente Demonstração", email: "cliente@cruzcake.com.br", senhaHash: await bcrypt.hash("Cliente1234", 10), telefone: "(11) 91234-5678", papel: "CLIENTE" },
   ]);
 
-  if (opcoes.log) console.log(`Seed: ${CATEGORIAS.length} categorias, ${PRODUTOS.length} produtos, 3 cupons e 2 usuários criados.`);
+  if (opcoes.log) console.log(`Seed: ${CATEGORIAS.length} categorias, ${PRODUTOS.length} produtos, 3 cupons, 3 zonas de entrega e 2 usuários criados.`);
 }
 
 /**

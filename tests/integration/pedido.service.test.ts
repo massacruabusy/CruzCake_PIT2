@@ -19,7 +19,9 @@ import {
   type DadosCheckout,
 } from "@/models/services/pedido.service";
 import { criarProduto, resumoPainel } from "@/models/services/admin.service";
-import { FRETE_FIXO_CENTAVOS } from "@/models/regras/pedido";
+import { cotarFrete, criarZona } from "@/models/services/frete.service";
+
+const FRETE_CENTRO = 990; // zona "Centro expandido (SP)" do seed
 
 let db: DB;
 let clienteId: number;
@@ -75,6 +77,12 @@ describe("Vitrine", () => {
     expect(lista.find((p) => p.slug === "cafe-com-avela")).toBeUndefined();
     expect(lista[0].destaque).toBe(true);
   });
+  it("RN09 — esgotados não aparecem na vitrine nem na busca, mas a página do produto informa", async () => {
+    const lista = await listarProdutosVitrine(db);
+    expect(lista.find((p) => p.slug === "coco-maracuja-sem-gluten")).toBeUndefined();
+    expect(await listarProdutosVitrine(db, { busca: "maracujá" })).toHaveLength(0);
+    await expect(obterProdutoPorSlug(db, "coco-maracuja-sem-gluten")).resolves.toMatchObject({ estoque: 0 });
+  });
   it("filtra por categoria e por busca", async () => {
     const veganos = await listarProdutosVitrine(db, { categoriaSlug: "veganos-sem-gluten" });
     expect(veganos.every((p) => p.categoriaSlug === "veganos-sem-gluten")).toBe(true);
@@ -89,11 +97,12 @@ describe("Vitrine", () => {
 describe("Carrinho", () => {
   it("recalcula preços no servidor e aplica cupom", async () => {
     const red = await produto("red-velvet");
-    const c = await precificarCarrinho(db, [{ produtoId: red.id, quantidade: 3 }], { codigoCupom: "bemvindo10" });
+    const c = await precificarCarrinho(db, [{ produtoId: red.id, quantidade: 3 }], { codigoCupom: "bemvindo10", cep: "01310-100" });
     expect(c.subtotalCentavos).toBe(3600);
     expect(c.descontoCentavos).toBe(360);
-    expect(c.freteCentavos).toBe(FRETE_FIXO_CENTAVOS);
-    expect(c.totalCentavos).toBe(3600 - 360 + FRETE_FIXO_CENTAVOS);
+    expect(c.freteCentavos).toBe(FRETE_CENTRO);
+    expect(c.totalCentavos).toBe(3600 - 360 + FRETE_CENTRO);
+    expect(c.entrega?.zona?.nome).toBe("Centro expandido (SP)");
   });
   it("aponta produto esgotado e quantidade acima do estoque", async () => {
     const esgotado = await produto("coco-maracuja-sem-gluten");
@@ -109,6 +118,25 @@ describe("Carrinho", () => {
     const c = await precificarCarrinho(db, [{ produtoId: red.id, quantidade: 1 }], { codigoCupom: "NATAL2025" });
     expect(c.descontoCentavos).toBe(0);
     expect(c.erroCupom).toMatch(/vencido/);
+  });
+});
+
+describe("Frete por CEP", () => {
+  it("cota frete e prazo de um CEP atendido", async () => {
+    const c = await cotarFrete(db, "08010-000", 5000);
+    expect(c).toMatchObject({ disponivel: true, freteCentavos: 1490, zona: { nome: "Zona Leste (SP)", prazoHoras: 3 } });
+  });
+  it("informa quando a loja não entrega no CEP", async () => {
+    expect(await cotarFrete(db, "20040-002")).toMatchObject({ disponivel: false, zona: null, freteCentavos: null });
+  });
+  it("administração cria nova zona e ela passa a valer", async () => {
+    await criarZona(db, { nome: "Rio (teste)", cepInicial: "20000000", cepFinal: "20999999", valorCentavos: 2500, freteGratisAPartirCentavos: null, prazoHoras: 24, ativo: true });
+    expect((await cotarFrete(db, "20040002")).freteCentavos).toBe(2500);
+  });
+  it("recusa faixa de CEP invertida", async () => {
+    await expect(
+      criarZona(db, { nome: "Errada", cepInicial: "09000000", cepFinal: "01000000", valorCentavos: 100, freteGratisAPartirCentavos: null, prazoHoras: 1, ativo: true }),
+    ).rejects.toMatchObject({ codigo: "VALIDACAO" });
   });
 });
 
@@ -150,6 +178,19 @@ describe("Checkout e ciclo do pedido", () => {
     await expect(
       criarPedido(db, clienteId, await checkoutBase({ itens: [{ produtoId: pouco.id, quantidade: 5 }] })),
     ).rejects.toMatchObject({ codigo: "ESTOQUE_INSUFICIENTE" });
+  });
+
+  it("bloqueia entrega para CEP fora das zonas, sem criar pedido", async () => {
+    await expect(
+      criarPedido(db, clienteId, await checkoutBase({ endereco: { ...endereco, cep: "20040002", cidade: "Rio de Janeiro", uf: "RJ" } })),
+    ).rejects.toMatchObject({ codigo: "ENTREGA_INDISPONIVEL" });
+    expect(await db.query.pedidos.findMany()).toHaveLength(0);
+  });
+
+  it("pedido de entrega guarda o frete da zona", async () => {
+    const p = await criarPedido(db, clienteId, await checkoutBase());
+    expect(p.freteCentavos).toBe(FRETE_CENTRO);
+    expect(p.zonaEntregaId).not.toBeNull();
   });
 
   it("entrega exige endereço; retirada não cobra frete", async () => {

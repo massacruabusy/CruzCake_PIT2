@@ -3,18 +3,31 @@
  * Por serem funções puras, são cobertas por testes unitários em `tests/unit`.
  */
 import { ErroNegocio } from "../erros";
-import type { Cupom, StatusPedido, TipoEntrega } from "../db/schema";
+import type { Cupom, StatusPedido, TipoEntrega, ZonaEntrega } from "../db/schema";
 
-/** RN02 — Frete fixo para entrega; grátis a partir de um valor mínimo; retirada não paga frete. */
-export const FRETE_FIXO_CENTAVOS = 990;
-export const FRETE_GRATIS_A_PARTIR_CENTAVOS = 12000;
 
 /** RN04 — Limite de unidades por item no carrinho (evita pedidos atípicos/fraude). */
 export const QUANTIDADE_MAXIMA_POR_ITEM = 24;
 
-export function calcularFrete(tipoEntrega: TipoEntrega, subtotalCentavos: number): number {
-  if (tipoEntrega === "RETIRADA") return 0;
-  return subtotalCentavos >= FRETE_GRATIS_A_PARTIR_CENTAVOS ? 0 : FRETE_FIXO_CENTAVOS;
+type ZonaFrete = Pick<ZonaEntrega, "id" | "nome" | "cepInicial" | "cepFinal" | "valorCentavos" | "freteGratisAPartirCentavos" | "prazoHoras" | "ativo">;
+
+/**
+ * RN02 — Frete por zona de entrega cadastrada pela loja.
+ * Encontra a zona ativa que cobre o CEP; havendo sobreposição, vale a faixa mais específica.
+ * Retorna null quando a loja não entrega no CEP.
+ */
+export function encontrarZona<Z extends ZonaFrete>(zonas: Z[], cep: string): Z | null {
+  const alvo = cep.replace(/\D/g, "");
+  if (alvo.length !== 8) return null;
+  const candidatas = zonas.filter((z) => z.ativo && z.cepInicial <= alvo && alvo <= z.cepFinal);
+  candidatas.sort((a, b) => Number(a.cepFinal) - Number(a.cepInicial) - (Number(b.cepFinal) - Number(b.cepInicial)));
+  return candidatas[0] ?? null;
+}
+
+/** RN02 — Valor do frete na zona: grátis quando os produtos (já com desconto) atingem o mínimo da zona. */
+export function calcularFrete(zona: Pick<ZonaFrete, "valorCentavos" | "freteGratisAPartirCentavos">, baseCentavos: number): number {
+  if (zona.freteGratisAPartirCentavos !== null && baseCentavos >= zona.freteGratisAPartirCentavos) return 0;
+  return zona.valorCentavos;
 }
 
 /** RN05 — Validação e cálculo de desconto do cupom. Lança CUPOM_INVALIDO quando não se aplica. */
@@ -46,10 +59,19 @@ export interface Totais {
   totalCentavos: number;
 }
 
-/** RN01 — total = subtotal − desconto + frete. O frete é calculado sobre o subtotal já com desconto. */
-export function calcularTotais(subtotalCentavos: number, descontoCentavos: number, tipoEntrega: TipoEntrega): Totais {
+/**
+ * RN01 — total = subtotal − desconto + frete. O frete é calculado sobre o subtotal já com desconto.
+ * Retirada na loja não paga frete; entrega sem zona definida (CEP ainda não informado) fica com frete 0
+ * e o checkout exige o CEP antes de concluir.
+ */
+export function calcularTotais(
+  subtotalCentavos: number,
+  descontoCentavos: number,
+  tipoEntrega: TipoEntrega,
+  zona: Pick<ZonaFrete, "valorCentavos" | "freteGratisAPartirCentavos"> | null = null,
+): Totais {
   const base = subtotalCentavos - descontoCentavos;
-  const freteCentavos = calcularFrete(tipoEntrega, base);
+  const freteCentavos = tipoEntrega === "RETIRADA" || !zona ? 0 : calcularFrete(zona, base);
   return { subtotalCentavos, descontoCentavos, freteCentavos, totalCentavos: base + freteCentavos };
 }
 

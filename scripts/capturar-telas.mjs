@@ -31,8 +31,20 @@ async function entrar(page, conta) {
   if (!r.ok()) throw new Error(`Login falhou para ${conta.email}: ${r.status()}`);
 }
 
+let catalogoCompleto = null;
+
+/** Catálogo completo (inclui esgotados, que não aparecem na vitrine), lido pela API do admin. */
+async function catalogo(navegador) {
+  if (catalogoCompleto) return catalogoCompleto;
+  const ctx = await navegador.newContext();
+  await ctx.request.post(`${BASE}/api/auth/entrar`, { data: ADMIN });
+  catalogoCompleto = await (await ctx.request.get(`${BASE}/api/admin/produtos`)).json();
+  await ctx.close();
+  return catalogoCompleto;
+}
+
 async function definirCarrinho(page, itens, cupom = "") {
-  const { produtos } = await (await page.request.get(`${BASE}/api/produtos`)).json();
+  const produtos = await catalogo(page.context().browser());
   const linhas = itens.map(([slug, quantidade]) => {
     const p = produtos.find((x) => x.slug === slug);
     return { produtoId: p.id, quantidade, nome: p.nome, imagemUrl: p.imagemUrl, precoCentavos: p.precoCentavos };
@@ -63,8 +75,22 @@ async function main() {
   await m.evaluate(() => window.scrollBy(0, -70));
   await foto(m, "tela-01-vitrine-mobile");
   await m.getByRole("button", { name: "Adicionar" }).nth(1).click();
-  await m.getByRole("status").filter({ hasText: "adicionado" }).waitFor();
-  await foto(m, "tela-01-vitrine-mobile-adicionado");
+  await m.getByRole("dialog", { name: /Seu carrinho/ }).waitFor();
+  await foto(m, "tela-03-minicarrinho");
+  await m.getByRole("button", { name: "Fechar", exact: true }).click();
+
+  // Kit com arte que mostra o conteúdo + cotação de frete por CEP
+  await m.goto(`${BASE}/produto/caixa-degustacao-6`);
+  await m.getByLabel(/Entregamos no seu endereço/).fill("08010000");
+  await m.getByRole("button", { name: "Calcular" }).click();
+  await m.getByText("Entregamos!").waitFor();
+  await foto(m, "tela-02-produto-kit-frete", { fullPage: true });
+  await m.getByLabel(/Entregamos no seu endereço/).fill("20040002");
+  await m.getByRole("button", { name: "Calcular" }).click();
+  await m.getByText("Ainda não entregamos").waitFor();
+  await m.getByRole("button", { name: "Calcular" }).scrollIntoViewIfNeeded();
+  await foto(m, "tela-02-frete-indisponivel");
+  await m.evaluate(() => localStorage.removeItem("cruzcake:carrinho:v1"));
 
   await definirCarrinho(m, [["chocolate-belga", 2], ["frutas-vermelhas", 6], ["coco-maracuja-sem-gluten", 1]], "NATAL2025");
   await m.goto(`${BASE}/carrinho`);
@@ -132,6 +158,16 @@ async function main() {
   await foto(d, "tela-11-admin-pedido-detalhe");
   await d.goto(`${BASE}/admin/produtos`);
   await foto(d, "tela-12-admin-produtos");
+  await d.goto(`${BASE}/admin/frete`);
+  await foto(d, "tela-16-admin-frete");
+  await d.goto(`${BASE}/admin/frete/novo`);
+  await d.getByLabel("Nome da zona").fill("Zona Sul (SP)");
+  await d.getByLabel("CEP inicial").fill("04999-999");
+  await d.getByLabel("CEP final").fill("04000-000");
+  await d.getByLabel("Frete (R$)").fill("12,90");
+  await d.getByRole("button", { name: "Salvar" }).click();
+  await d.getByText("Deve ser maior ou igual ao CEP inicial.").waitFor();
+  await foto(d, "tela-17-admin-zona-validacao");
   await d.goto(`${BASE}/admin/produtos/novo`);
   await d.getByRole("button", { name: "Salvar" }).click();
   await d.getByText("Selecione uma categoria.").first().waitFor();

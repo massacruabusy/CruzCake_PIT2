@@ -6,9 +6,11 @@ interface Props {
   freteCentavos: number;
   totalCentavos: number;
   tipoEntrega?: "ENTREGA" | "RETIRADA";
+  /** false quando a entrega ainda não tem CEP calculado */
+  freteCalculado?: boolean;
 }
 
-export function ResumoValores({ subtotalCentavos, descontoCentavos, freteCentavos, totalCentavos, tipoEntrega }: Props) {
+export function ResumoValores({ subtotalCentavos, descontoCentavos, freteCentavos, totalCentavos, tipoEntrega, freteCalculado = true }: Props) {
   return (
     <dl className="flex flex-col gap-1 text-stone-700">
       <div className="flex justify-between">
@@ -23,10 +25,10 @@ export function ResumoValores({ subtotalCentavos, descontoCentavos, freteCentavo
       )}
       <div className="flex justify-between">
         <dt>{tipoEntrega === "RETIRADA" ? "Retirada na loja" : "Frete"}</dt>
-        <dd>{freteCentavos === 0 ? "Grátis" : formatarCentavos(freteCentavos)}</dd>
+        <dd>{!freteCalculado ? "Informe o CEP" : freteCentavos === 0 ? "Grátis" : formatarCentavos(freteCentavos)}</dd>
       </div>
       <div className="mt-2 flex justify-between border-t border-marca-100 pt-2 text-xl font-black text-cacau-900">
-        <dt>Total</dt>
+        <dt>{freteCalculado ? "Total" : "Total sem frete"}</dt>
         <dd>{formatarCentavos(totalCentavos)}</dd>
       </div>
     </dl>

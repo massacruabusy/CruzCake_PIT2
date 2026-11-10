@@ -2,9 +2,11 @@
 
 /**
  * VIEW — Estado do carrinho no navegador (persistido em localStorage).
- * Guarda apenas id, quantidade e dados de exibição; preço e estoque oficiais vêm sempre do servidor.
+ * Guarda apenas id, quantidade, dados de exibição, cupom e CEP; preço, estoque e frete oficiais
+ * vêm sempre do servidor. Também controla o minicarrinho (gaveta lateral) e os avisos.
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { MiniCarrinho } from "./MiniCarrinho";
 
 export interface ItemCarrinho {
   produtoId: number;
@@ -24,12 +26,17 @@ interface ContextoCarrinho {
   itens: ItemCarrinho[];
   totalItens: number;
   cupom: string;
+  cep: string;
   carregado: boolean;
+  miniAberto: boolean;
   adicionar: (item: Omit<ItemCarrinho, "quantidade">, quantidade?: number) => void;
   alterarQuantidade: (produtoId: number, quantidade: number) => void;
   remover: (produtoId: number) => void;
   limpar: () => void;
   definirCupom: (codigo: string) => void;
+  definirCep: (cep: string) => void;
+  abrirMini: () => void;
+  fecharMini: () => void;
   avisar: (texto: string, tipo?: Aviso["tipo"]) => void;
 }
 
@@ -40,7 +47,9 @@ export const MAX_POR_ITEM = 24;
 export function CarrinhoProvider({ children }: { children: ReactNode }) {
   const [itens, setItens] = useState<ItemCarrinho[]>([]);
   const [cupom, setCupom] = useState("");
+  const [cep, setCep] = useState("");
   const [carregado, setCarregado] = useState(false);
+  const [miniAberto, setMiniAberto] = useState(false);
   const [avisos, setAvisos] = useState<Aviso[]>([]);
 
   useEffect(() => {
@@ -49,6 +58,7 @@ export function CarrinhoProvider({ children }: { children: ReactNode }) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- hidratação a partir do localStorage
       if (Array.isArray(salvo.itens)) setItens(salvo.itens);
       if (typeof salvo.cupom === "string") setCupom(salvo.cupom);
+      if (typeof salvo.cep === "string") setCep(salvo.cep);
     } catch {
       /* armazenamento indisponível: segue com carrinho vazio */
     }
@@ -58,11 +68,11 @@ export function CarrinhoProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!carregado) return;
     try {
-      localStorage.setItem(CHAVE, JSON.stringify({ itens, cupom }));
+      localStorage.setItem(CHAVE, JSON.stringify({ itens, cupom, cep }));
     } catch {
       /* ignora */
     }
-  }, [itens, cupom, carregado]);
+  }, [itens, cupom, cep, carregado]);
 
   const avisar = useCallback((texto: string, tipo: Aviso["tipo"] = "sucesso") => {
     const id = Date.now() + Math.random();
@@ -95,27 +105,36 @@ export function CarrinhoProvider({ children }: { children: ReactNode }) {
     setItens([]);
     setCupom("");
   }, []);
+  const definirCep = useCallback((valor: string) => setCep(valor.replace(/\D/g, "").slice(0, 8)), []);
+  const abrirMini = useCallback(() => setMiniAberto(true), []);
+  const fecharMini = useCallback(() => setMiniAberto(false), []);
 
   const valor = useMemo<ContextoCarrinho>(
     () => ({
       itens,
       totalItens: itens.reduce((s, i) => s + i.quantidade, 0),
       cupom,
+      cep,
       carregado,
+      miniAberto,
       adicionar,
       alterarQuantidade,
       remover,
       limpar,
       definirCupom: setCupom,
+      definirCep,
+      abrirMini,
+      fecharMini,
       avisar,
     }),
-    [itens, cupom, carregado, adicionar, alterarQuantidade, remover, limpar, avisar],
+    [itens, cupom, cep, carregado, miniAberto, adicionar, alterarQuantidade, remover, limpar, definirCep, abrirMini, fecharMini, avisar],
   );
 
   return (
     <Contexto.Provider value={valor}>
       {children}
-      <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-4 z-50 flex flex-col items-center gap-2 px-4">
+      <MiniCarrinho />
+      <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-4 z-[60] flex flex-col items-center gap-2 px-4">
         {avisos.map((a) => (
           <div
             key={a.id}
