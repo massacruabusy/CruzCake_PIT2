@@ -6,7 +6,7 @@ import { BotaoAdicionar } from "./BotaoAdicionar";
 
 export function ProdutoCard({ produto }: { produto: ProdutoVitrine }) {
   return (
-    <article className="cartao flex flex-col gap-3 p-4">
+    <article className="cartao flex flex-col gap-2 p-3 sm:gap-3 sm:p-4">
       <Link href={`/produto/${produto.slug}`} className="group block">
         <div className="relative overflow-hidden rounded-xl bg-marca-50">
           <Image
@@ -27,11 +27,11 @@ export function ProdutoCard({ produto }: { produto: ProdutoVitrine }) {
           )}
         </div>
         <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-stone-500">{produto.categoria}</p>
-        <h3 className="text-lg font-extrabold leading-tight group-hover:text-marca-700">{produto.nome}</h3>
+        <h3 className="text-base font-extrabold leading-tight group-hover:text-marca-700 sm:text-lg">{produto.nome}</h3>
       </Link>
-      <p className="line-clamp-2 text-sm text-stone-600">{produto.descricao}</p>
+      <p className="hidden text-sm text-stone-600 sm:line-clamp-2">{produto.descricao}</p>
       <div className="mt-auto flex items-center justify-between gap-2">
-        <span className="text-xl font-black text-marca-700">{formatarCentavos(produto.precoCentavos)}</span>
+        <span className="text-lg font-black text-marca-700 sm:text-xl">{formatarCentavos(produto.precoCentavos)}</span>
       </div>
       <BotaoAdicionar produto={produto} />
     </article>

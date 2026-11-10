@@ -34,7 +34,7 @@ export default async function PaginaProduto(props: PageProps<"/produto/[slug]">)
         <span aria-current="page">{p.nome}</span>
       </nav>
       <div className="grid gap-6 md:grid-cols-2">
-        <div className="overflow-hidden rounded-3xl bg-marca-50">
+        <div className="mx-auto w-full max-w-xs overflow-hidden rounded-3xl bg-marca-50 md:max-w-none">
           <Image src={p.imagemUrl} alt={`Cupcake ${p.nome}`} width={600} height={600} unoptimized priority className="aspect-square w-full" />
         </div>
         <div className="flex flex-col gap-4">

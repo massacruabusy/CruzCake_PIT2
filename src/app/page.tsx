@@ -62,7 +62,7 @@ export default async function PaginaVitrine(props: PageProps<"/">) {
             <Link href="/" className="btn-secundario mt-4">Ver todos os sabores</Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             {produtos.map((p) => (
               <ProdutoCard key={p.id} produto={p} />
             ))}
