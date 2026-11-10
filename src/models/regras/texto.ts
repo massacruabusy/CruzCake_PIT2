@@ -1,0 +1,12 @@
+export function gerarSlug(texto: string): string {
+  return texto
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+export function somenteDigitos(texto: string): string {
+  return texto.replace(/\D/g, "");
+}
