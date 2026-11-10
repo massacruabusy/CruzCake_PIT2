@@ -1,16 +1,18 @@
 # Mensagem para os testadores (Slack/WhatsApp)
 
-Copie o bloco abaixo e mande para cada colega depois de explicar pessoalmente.
+Copie o bloco abaixo e mande para cada colega. A explicação já está na mensagem.
 
 ```
 🧁 Teste CruzCake: https://cruz-cake-pit-2.vercel.app
+
+Preciso que você teste esse app da faculdade e me dê uma opinião sincera. Pode ser sobre algo específico. Dá uma navegada por tudo e, se der, tenta assumir um dos papéis abaixo.
 
 Logins:
 • Cliente: cliente@cruzcake.com.br / Cliente1234
 • Admin: admin@cruzcake.com.br / Admin1234
 Cartão teste: 4111 1111 1111 1111 (aprovado) · 4000 0000 0002 0000 (recusado) · 12/30 · CVV 123
 
-Se puder, escolhe um papel:
+Papéis:
 • Visitante: ainda sem conta, decidindo se compra
 • Cliente: fazendo e acompanhando pedidos
 • Admin: dono(a) da loja cuidando de produtos e pedidos
