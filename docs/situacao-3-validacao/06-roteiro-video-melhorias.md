@@ -6,7 +6,7 @@ Vídeo exigido na Situação 3: apresentar as modificações feitas no sistema *
 
 | Tempo | Bloco | O que mostrar / falar |
 |---|---|---|
-| 0:00 – 0:20 | Abertura | Nome, RGM, projeto ("Doce Nuvem Cupcakes, PIT II, Situação 3"). Objetivo do vídeo: mostrar o que mudou após os testes com usuários. |
+| 0:00 – 0:20 | Abertura | Nome, RGM, projeto ("CruzCake Cupcakes, PIT II, Situação 3"). Objetivo do vídeo: mostrar o que mudou após os testes com usuários. |
 | 0:20 – 0:50 | Como foi o teste | Mostrar rapidamente o formulário e a planilha de respostas: 5 testadores, perfis e quantidade de apontamentos. Citar a classificação por gravidade. |
 | 0:50 – 3:30 | Correções e melhorias (3 a 5 itens) | Para cada item: **(1)** o que o testador relatou, mostrando o print "antes"; **(2)** o que foi alterado, mostrando o trecho de código ou o commit no GitHub; **(3)** demonstração ao vivo no app funcionando, "depois". |
 | | Item 1 | [preencher: D-01 — …] |

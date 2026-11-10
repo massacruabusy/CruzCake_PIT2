@@ -6,7 +6,7 @@ Especificação do formulário a ser criado no **Google Forms** e enviado a **5 
 
 ## Configuração do formulário
 
-- **Título:** Teste da Loja Doce Nuvem Cupcakes — Projeto Integrador
+- **Título:** Teste da Loja CruzCake Cupcakes — Projeto Integrador
 - **Descrição:** "Obrigado por testar! Use o app como se fosse um cliente de verdade. Nenhum pagamento é cobrado: os pagamentos são simulados. Leva de 15 a 20 minutos."
 - **Configurações:** coletar e-mail = *não* (o nome já identifica). Permitir upload de arquivos, o que exige que o testador esteja logado em uma conta Google; avisar isso no convite. Limitar a 1 resposta = não (o testador pode enviar uma segunda rodada após as correções).
 - **Respostas:** vincular a uma Planilha Google para consolidar as fichas.
@@ -35,7 +35,7 @@ Texto de orientação: "Tente realizar as tarefas abaixo. Marque as que você co
 - [ ] T6. Finalizar uma compra com **cartão** e entrega (cartão de teste `4111 1111 1111 1111`, validade futura, CVV `123`)
 - [ ] T7. Testar um cartão recusado (`4000 0000 0002 0000`) e verificar a mensagem
 - [ ] T8. Cancelar um pedido em "Meus pedidos"
-- [ ] T9. (Opcional) Entrar como administrador (`admin@docenuvem.com.br` / `Admin1234`), avançar um pedido até "Entregue" e cadastrar um produto
+- [ ] T9. (Opcional) Entrar como administrador (`admin@cruzcake.com.br` / `Admin1234`), avançar um pedido até "Entregue" e cadastrar um produto
 - [ ] T10. Usar o app pelo celular
 
 ## Seção 3 — Resultado do teste

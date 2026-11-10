@@ -9,8 +9,8 @@ Roteiro ponta a ponta executado no navegador, que corresponde ao nível **Teste 
 
 | Item | Valor |
 |---|---|
-| Cliente | `cliente@docenuvem.com.br` / `Cliente1234` |
-| Administrador | `admin@docenuvem.com.br` / `Admin1234` |
+| Cliente | `cliente@cruzcake.com.br` / `Cliente1234` |
+| Administrador | `admin@cruzcake.com.br` / `Admin1234` |
 | Cartão aprovado | `4111 1111 1111 1111`, validade `12/30`, CVV `123`, nome `CLIENTE TESTE` |
 | Cartão recusado | `4000 0000 0002 0000`, validade `12/30`, CVV `123` |
 | CEP | `01310-100`, número `1000` |
@@ -206,7 +206,7 @@ Roteiro ponta a ponta executado no navegador, que corresponde ao nível **Teste 
 
 | Campo | Conteúdo |
 |---|---|
-| **Pré-condição** | Pedido #1 pertence a `cliente@docenuvem.com.br` |
+| **Pré-condição** | Pedido #1 pertence a `cliente@cruzcake.com.br` |
 | **Passos** | 1. Sem login, abrir `/checkout` e `/pedidos`. 2. Logado como cliente, abrir `/admin`. 3. Criar uma segunda conta de cliente e abrir `/pedidos/1`. 4. Como cliente, chamar `GET /api/admin/produtos`. |
 | **Resultado esperado** | Passo 1: redireciona para `/entrar?voltar=...` e, após o login, volta à página pedida. Passo 2: redireciona para a vitrine. Passo 3: página "não encontrada" (não revela que o pedido existe). Passo 4: HTTP 403 com "Acesso restrito à administração da loja." |
 | **Resultado obtido** | |
@@ -240,7 +240,7 @@ Roteiro ponta a ponta executado no navegador, que corresponde ao nível **Teste 
 | Campo | Conteúdo |
 |---|---|
 | **Pré-condição** | Sem login |
-| **Passos** | 1. Cadastrar com o e-mail `cliente@docenuvem.com.br`. 2. Em `/entrar`, usar o e-mail certo com a senha errada. 3. Usar um e-mail inexistente. |
+| **Passos** | 1. Cadastrar com o e-mail `cliente@cruzcake.com.br`. 2. Em `/entrar`, usar o e-mail certo com a senha errada. 3. Usar um e-mail inexistente. |
 | **Resultado esperado** | 1: "Já existe uma conta com este e-mail…" no campo e-mail. 2 e 3: a mesma mensagem genérica "E-mail ou senha incorretos." (não revela quais e-mails existem). |
 | **Resultado obtido** | |
 | **Status** | Pendente |

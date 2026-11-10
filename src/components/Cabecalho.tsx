@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useCarrinho } from "./CarrinhoProvider";
+import { LogoCruzCake } from "./Logo";
 import { chamarApi } from "@/lib/api-cliente";
 import type { Sessao } from "@/lib/sessao";
 
@@ -22,9 +23,8 @@ export function Cabecalho({ sessao }: { sessao: Sessao | null }) {
   return (
     <header className="sticky top-0 z-40 border-b border-marca-100 bg-white/95 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
-        <Link href="/" className="flex items-center gap-2 text-xl font-black text-marca-700" aria-label="Doce Nuvem — página inicial">
-          <span aria-hidden className="text-2xl">🧁</span>
-          <span>Doce Nuvem</span>
+        <Link href="/" className="shrink-0" aria-label="CruzCake — página inicial">
+          <LogoCruzCake />
         </Link>
 
         <form action="/" className="ml-auto hidden flex-1 sm:block sm:max-w-sm" role="search">

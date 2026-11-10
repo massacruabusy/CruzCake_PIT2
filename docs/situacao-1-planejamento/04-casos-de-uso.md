@@ -1,4 +1,4 @@
-# Casos de Uso — Doce Nuvem Cupcakes
+# Casos de Uso — CruzCake Cupcakes
 
 > Documento revisado no PIT II. As referências a telas (TELA-xx) e regras de negócio (RNxx) seguem a mesma numeração usada nas histórias de usuário, nos wireframes e no código-fonte.
 
@@ -22,7 +22,7 @@ flowchart LR
     GW(["Gateway de Pagamento - simulado"])
     CEP(["ViaCEP"])
 
-    subgraph SIS["Sistema Doce Nuvem"]
+    subgraph SIS["Sistema CruzCake"]
         UC01["UC01 Consultar cardápio"]
         UC02["UC02 Ver detalhe do produto"]
         UC03["UC03 Manter carrinho"]

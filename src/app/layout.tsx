@@ -8,7 +8,7 @@ import "./globals.css";
 const nunito = Nunito({ variable: "--font-nunito", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: { default: "Doce Nuvem Cupcakes", template: "%s | Doce Nuvem Cupcakes" },
+  title: { default: "CruzCake Cupcakes", template: "%s | CruzCake Cupcakes" },
   description: "Cupcakes gourmet feitos todos os dias. Peça online e receba em casa ou retire na loja.",
 };
 
@@ -27,7 +27,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           </main>
           <footer className="border-t border-marca-100 bg-white">
             <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-6 text-sm text-stone-600 sm:flex-row sm:justify-between">
-              <p>Doce Nuvem Cupcakes · Rua das Confeitarias, 123 · São Paulo/SP</p>
+              <p>CruzCake Cupcakes · Rua das Confeitarias, 123 · São Paulo/SP</p>
               <p>Ter a dom, 10h às 20h · Projeto acadêmico — pagamentos simulados</p>
             </div>
           </footer>

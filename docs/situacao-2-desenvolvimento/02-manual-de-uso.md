@@ -1,13 +1,13 @@
 # Manual de uso
 
-> Doce Nuvem Cupcakes: loja virtual de cupcakes. **Ambiente de demonstração: nenhum pagamento é cobrado de verdade.**
+> CruzCake Cupcakes: loja virtual de cupcakes. **Ambiente de demonstração: nenhum pagamento é cobrado de verdade.**
 
 ## Dados para teste
 
 | O quê | Valor |
 |---|---|
-| Conta de cliente | `cliente@docenuvem.com.br` / `Cliente1234` |
-| Conta de administração | `admin@docenuvem.com.br` / `Admin1234` |
+| Conta de cliente | `cliente@cruzcake.com.br` / `Cliente1234` |
+| Conta de administração | `admin@cruzcake.com.br` / `Admin1234` |
 | Cartão aprovado | `4111 1111 1111 1111`, qualquer nome, validade futura (ex.: `12/30`), CVV `123` |
 | Cartão recusado | `4000 0000 0002 0000` (simula recusa da operadora) |
 | CEP de exemplo | `01310-100` (preenche Av. Paulista automaticamente) |

@@ -1,4 +1,6 @@
-# 🧁 Doce Nuvem Cupcakes: loja virtual
+<p align="center"><img src="public/logo.svg" alt="CruzCake" width="360"></p>
+
+# CruzCake Cupcakes: loja virtual
 
 Aplicação web responsiva de e-commerce para uma confeitaria de cupcakes gourmet: **vitrine virtual, carrinho, pedido eletrônico, pagamento (PIX e cartão simulados) e entrega ou retirada**, mais um **painel administrativo** para produtos, estoque e pedidos.
 
@@ -30,7 +32,7 @@ npm run dev        # cria o banco local (migrações + seed) e abre em http://lo
 npm test           # 52 testes unitários e de integração
 ```
 
-Contas de demonstração: `cliente@docenuvem.com.br` / `Cliente1234` e `admin@docenuvem.com.br` / `Admin1234`. Cartão aprovado `4111 1111 1111 1111`; recusado `4000 0000 0002 0000`. Mais dados no [manual de uso](docs/situacao-2-desenvolvimento/02-manual-de-uso.md). Deploy (Vercel + Neon): [instalação e implantação](docs/situacao-2-desenvolvimento/03-instalacao-e-implantacao.md).
+Contas de demonstração: `cliente@cruzcake.com.br` / `Cliente1234` e `admin@cruzcake.com.br` / `Admin1234`. Cartão aprovado `4111 1111 1111 1111`; recusado `4000 0000 0002 0000`. Mais dados no [manual de uso](docs/situacao-2-desenvolvimento/02-manual-de-uso.md). Deploy (Vercel + Neon): [instalação e implantação](docs/situacao-2-desenvolvimento/03-instalacao-e-implantacao.md).
 
 ## Documentação
 
@@ -73,4 +75,4 @@ docs               documentação organizada por situação-problema
 
 **Guilherme Henrique Dalla Rosa**, Engenharia de Software, Cruzeiro do Sul Virtual.
 
-> Projeto acadêmico. A marca "Doce Nuvem" é fictícia e nenhum pagamento real é processado.
+> Projeto acadêmico. A marca "CruzCake" é fictícia; a estrela do logo é uma homenagem à Universidade Cruzeiro do Sul. Nenhum pagamento real é processado.

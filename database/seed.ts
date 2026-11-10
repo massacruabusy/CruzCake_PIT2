@@ -3,8 +3,8 @@
  * Idempotente: só insere se o banco estiver vazio.
  *
  * Usuários de teste (apenas ambiente de demonstração):
- *   admin@docenuvem.com.br   / Admin1234
- *   cliente@docenuvem.com.br / Cliente1234
+ *   admin@cruzcake.com.br   / Admin1234
+ *   cliente@cruzcake.com.br / Cliente1234
  */
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
@@ -79,8 +79,8 @@ export async function semearBanco(db: DB, opcoes: { log?: boolean } = {}) {
   ]);
 
   await db.insert(usuarios).values([
-    { nome: "Administração Doce Nuvem", email: "admin@docenuvem.com.br", senhaHash: await bcrypt.hash("Admin1234", 10), papel: "ADMIN" },
-    { nome: "Cliente Demonstração", email: "cliente@docenuvem.com.br", senhaHash: await bcrypt.hash("Cliente1234", 10), telefone: "(11) 91234-5678", papel: "CLIENTE" },
+    { nome: "Administração CruzCake", email: "admin@cruzcake.com.br", senhaHash: await bcrypt.hash("Admin1234", 10), papel: "ADMIN" },
+    { nome: "Cliente Demonstração", email: "cliente@cruzcake.com.br", senhaHash: await bcrypt.hash("Cliente1234", 10), telefone: "(11) 91234-5678", papel: "CLIENTE" },
   ]);
 
   if (opcoes.log) console.log(`Seed: ${CATEGORIAS.length} categorias, ${PRODUTOS.length} produtos, 3 cupons e 2 usuários criados.`);

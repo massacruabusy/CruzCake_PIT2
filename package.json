@@ -13,7 +13,8 @@
     "test:coverage": "vitest run --coverage",
     "db:generate": "drizzle-kit generate",
     "db:setup": "tsx database/setup.ts",
-    "db:reset": "node -e \"require('fs').rmSync('.data',{recursive:true,force:true})\" && npm run db:setup"
+    "db:reset": "node -e \"require('fs').rmSync('.data',{recursive:true,force:true})\" && npm run db:setup",
+    "telas": "node scripts/capturar-telas.mjs"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.16",
@@ -37,6 +38,7 @@
     "drizzle-kit": "^0.31.11",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
+    "playwright-core": "^1.65.0",
     "tailwindcss": "4.3.3",
     "tsx": "^4.23.15",
     "typescript": "^5",

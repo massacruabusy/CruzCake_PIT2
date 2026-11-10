@@ -18,7 +18,7 @@ export function ProdutoCard({ produto }: { produto: ProdutoVitrine }) {
             className="aspect-square w-full transition group-hover:scale-105"
           />
           {produto.destaque && (
-            <span className="absolute left-2 top-2 rounded-full bg-marca-600 px-2 py-0.5 text-xs font-bold text-white">Destaque</span>
+            <span className="absolute left-2 top-2 rounded-full bg-estrela-500 px-2 py-0.5 text-xs font-bold text-marca-900">★ Destaque</span>
           )}
           {produto.estoque > 0 && produto.estoque <= 5 && (
             <span className="absolute right-2 top-2 rounded-full bg-amber-500 px-2 py-0.5 text-xs font-bold text-white">

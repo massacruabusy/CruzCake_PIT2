@@ -4,7 +4,7 @@
 
 ## 1.1 Contexto do negócio
 
-A **Doce Nuvem Cupcakes** é uma confeitaria de cupcakes gourmet com loja física em São Paulo. A dona já teve uma experiência ruim com outro fornecedor: o app foi construído sem ouvir o negócio, não funcionava e foi retirado do ar depois de muitas reclamações, arranhando a imagem da marca. Por isso o projeto começou por uma **imersão no negócio** (loja, produção e atendimento), seguida de levantamento de histórias de usuário com validação constante junto à cliente.
+A **CruzCake Cupcakes** é uma confeitaria de cupcakes gourmet com loja física em São Paulo. A dona já teve uma experiência ruim com outro fornecedor: o app foi construído sem ouvir o negócio, não funcionava e foi retirado do ar depois de muitas reclamações, arranhando a imagem da marca. Por isso o projeto começou por uma **imersão no negócio** (loja, produção e atendimento), seguida de levantamento de histórias de usuário com validação constante junto à cliente.
 
 **Objetivo do produto:** vender cupcakes pela internet com uma experiência simples e confiável, cobrindo **vitrine virtual, pedido eletrônico, pagamento e entrega/retirada**, além de dar à loja uma ferramenta para controlar produtos, estoque e o andamento dos pedidos.
 

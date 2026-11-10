@@ -5,7 +5,7 @@
 
 | Tempo | Cena | O que mostrar | Fala sugerida (adapte com suas palavras) |
 |---|---|---|---|
-| 0:00–0:30 | Abertura | Slide ou README no GitHub | "Sou Guilherme Dalla Rosa e este é o Doce Nuvem, a loja virtual de cupcakes que planejei no PIT I e desenvolvi no PIT II." |
+| 0:00–0:30 | Abertura | Slide ou README no GitHub | "Sou Guilherme Dalla Rosa e este é o CruzCake, a loja virtual de cupcakes que planejei no PIT I e desenvolvi no PIT II." |
 | 0:30–1:15 | Contexto e decisões | `docs/situacao-1-planejamento/01-escopo-e-revisao.md` | O problema da cliente (app anterior que falhou), as decisões: web responsiva em vez de app nativo, Next.js + PostgreSQL, MVC |
 | 1:15–2:30 | Vitrine e carrinho (celular) | DevTools em modo celular: vitrine, filtro, busca, produto, adicionar, carrinho | Mostrar o contador do carrinho, estoque baixo, "Esgotado", cupom `NATAL2025` vencido e depois `BEMVINDO10` aplicado |
 | 2:30–4:00 | Checkout | Login com redirecionamento, CEP 01310-100 preenchendo a rua, cartão recusado (`4000 0000 0002 0000`) e depois aprovado | Explicar que o preço é recalculado no servidor e que a recusa não cria pedido nem baixa estoque |

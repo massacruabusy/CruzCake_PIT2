@@ -34,7 +34,7 @@ interface ContextoCarrinho {
 }
 
 const Contexto = createContext<ContextoCarrinho | null>(null);
-const CHAVE = "docenuvem:carrinho:v1";
+const CHAVE = "cruzcake:carrinho:v1";
 export const MAX_POR_ITEM = 24;
 
 export function CarrinhoProvider({ children }: { children: ReactNode }) {

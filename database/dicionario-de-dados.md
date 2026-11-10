@@ -1,4 +1,4 @@
-# Dicionário de dados: Doce Nuvem Cupcakes
+# Dicionário de dados: CruzCake Cupcakes
 
 SGBD: PostgreSQL · Esquema: `public` · Fonte: `src/models/db/schema.ts` · DDL: `database/migrations/0000_estrutura_inicial.sql`
 

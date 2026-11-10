@@ -49,7 +49,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
    ```
    No PowerShell: `$env:DATABASE_URL="postgresql://..."; npm run db:setup`
 3. **Aplicação:** em [vercel.com](https://vercel.com) importe o repositório do GitHub, configure `DATABASE_URL` e `SESSION_SECRET` em *Settings → Environment Variables* e faça o deploy. O comando de build padrão (`next build`) já serve.
-4. Acesse a URL gerada (ex.: `https://doce-nuvem.vercel.app`) e preencha o campo "Link da solução em funcionamento" no documento de entrega.
+4. Acesse a URL gerada (ex.: `https://cruzcake.vercel.app`) e preencha o campo "Link da solução em funcionamento" no documento de entrega.
 
 > Alternativas equivalentes: Render (web service + PostgreSQL) ou Railway. Qualquer provedor com Node.js 20+ e PostgreSQL funciona.
 

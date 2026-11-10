@@ -1,4 +1,4 @@
-# Plano de Testes — Doce Nuvem Cupcakes
+# Plano de Testes — CruzCake Cupcakes
 
 > Situação-Problema 3 do PIT II: realizar e documentar os testes (verificação e validação), mostrando que o comportamento esperado foi atingido.
 
@@ -73,8 +73,8 @@ flowchart LR
 
 | Tipo | Valor |
 |---|---|
-| Cliente | `cliente@docenuvem.com.br` / `Cliente1234` |
-| Administrador | `admin@docenuvem.com.br` / `Admin1234` |
+| Cliente | `cliente@cruzcake.com.br` / `Cliente1234` |
+| Administrador | `admin@cruzcake.com.br` / `Admin1234` |
 | Cartão aprovado | `4111 1111 1111 1111`, validade futura, CVV `123` |
 | Cartão recusado | `4000 0000 0002 0000` (válido no Luhn, recusado pelo "emissor" simulado) |
 | CEP | `01310-100` (Av. Paulista, preenchido via ViaCEP) |

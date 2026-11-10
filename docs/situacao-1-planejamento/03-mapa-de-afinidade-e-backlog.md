@@ -8,7 +8,7 @@ As histórias foram agrupadas em 7 eixos temáticos.
 
 ```mermaid
 flowchart LR
-    APP["Doce Nuvem — loja virtual de cupcakes"]
+    APP["CruzCake — loja virtual de cupcakes"]
 
     APP --> T["Técnicas"]
     APP --> V["Vitrine"]

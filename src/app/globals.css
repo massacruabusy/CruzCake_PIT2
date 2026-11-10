@@ -1,16 +1,22 @@
 @import "tailwindcss";
 
-/* Identidade visual Doce Nuvem: rosa framboesa + chocolate, fundo creme. */
+/* Identidade visual CruzCake: azul-marinho + laranja estrela, fundo creme. */
 @theme {
-  --color-marca-50: #fff1f5;
-  --color-marca-100: #ffe1ea;
-  --color-marca-200: #ffc2d4;
-  --color-marca-500: #e5487a;
-  --color-marca-600: #cc2f62;
-  --color-marca-700: #a8204e;
-  --color-cacau-700: #5b3a29;
-  --color-cacau-900: #2e1b12;
-  --color-creme: #fffaf5;
+  --color-marca-50: #eef3fb;
+  --color-marca-100: #dce6f6;
+  --color-marca-200: #b9cdec;
+  --color-marca-300: #8eaedf;
+  --color-marca-500: #2a5bb0;
+  --color-marca-600: #123f86;
+  --color-marca-700: #0a2d63;
+  --color-marca-900: #061a3b;
+  --color-estrela-100: #fff1d1;
+  --color-estrela-400: #ffb31f;
+  --color-estrela-500: #f5a000;
+  --color-estrela-600: #c27d00;
+  --color-cacau-700: #23406e;
+  --color-cacau-900: #0b1f3f;
+  --color-creme: #fbf9f4;
   --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
 }
 

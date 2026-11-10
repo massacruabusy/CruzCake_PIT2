@@ -7,24 +7,29 @@
 | Princípio (material do curso) | Como foi aplicado |
 |---|---|
 | **Clara** | Linguagem do cliente ("Como quer receber?", "Finalizar compra"), preço sempre em destaque, total exibido antes de pagar |
-| **Consistente** | Mesmos componentes em todas as telas: botão primário rosa, secundário com contorno, erros em vermelho abaixo do campo |
+| **Consistente** | Mesmos componentes em todas as telas: botão primário azul-marinho, secundário com contorno, erros em vermelho abaixo do campo |
 | **Simples / divulgação progressiva** | O checkout mostra campos de endereço só para entrega e campos de cartão só quando o cartão é escolhido |
 | **Controlada pelo usuário** | O cliente decide quando aplicar cupom, pode remover itens e cupom a qualquer momento e cancelar o pedido antes do preparo |
 | **Direta** | Adicionar ao carrinho atualiza o contador do cabeçalho na hora e mostra aviso "1× Chocolate Belga adicionado" |
 | **Empática e reversível** | Cancelamento pede confirmação; o carrinho fica salvo no navegador mesmo se a página falhar; mensagens explicam o que fazer em seguida |
 | **Dá resposta (feedback)** | Botões mostram "Processando…", avisos *toast* em `aria-live`, linha do tempo do pedido |
-| **Esteticamente agradável** | Paleta da marca (framboesa + chocolate sobre creme), tipografia arredondada (Nunito), ilustrações de cupcake |
+| **Esteticamente agradável** | Paleta da marca (azul-marinho + laranja estrela sobre creme), tipografia arredondada (Nunito), ilustrações de cupcake |
 
 ### Identidade visual
 
+![Logo CruzCake](../../public/logo.svg)
+
+O logo é um cupcake com uma **estrela laranja em traço contínuo** no lugar da cereja, uma homenagem à estrela da Universidade Cruzeiro do Sul. O nome **CruzCake** junta "Cruz" (Cruzeiro) e "Cake".
+
 | Elemento | Valor |
 |---|---|
-| Cor primária (marca) | `#cc2f62` framboesa (botões, preços, destaques) |
-| Cor de texto | `#2e1b12` chocolate |
-| Fundo | `#fffaf5` creme |
-| Alertas | vermelho `#b91c1c` (erro), âmbar (atenção/estoque baixo), verde (sucesso/desconto) |
+| Cor primária | `#0a2d63` azul-marinho (botões, títulos, preços) |
+| Cor de destaque | `#f5a000` laranja estrela (logo, selo "★ Destaque") |
+| Fundo | `#fbf9f4` creme; cartões brancos com borda azul clara |
+| Alertas | vermelho `#b91c1c` (erro), âmbar (estoque baixo), verde (sucesso/desconto) |
 | Tipografia | Nunito (títulos em peso 900, texto 400–700) |
-| Componentes | cantos arredondados (12–24 px), cartões brancos com borda rosa clara |
+| Componentes | cantos arredondados (12–24 px), botões em pílula |
+| Arquivos | `public/logo.svg`, `src/app/icon.svg` (favicon), componente `src/components/Logo.tsx` |
 
 ### Acessibilidade
 
@@ -36,7 +41,7 @@ Relaciona os conceitos do domínio que o usuário encontra na interface.
 
 ```mermaid
 mindmap
-  root((Doce Nuvem Cupcakes))
+  root((CruzCake Cupcakes))
     Cardápio
       Categorias
         Clássicos
@@ -199,7 +204,7 @@ TELA-07 Pedido               TELA-11 Pedido (admin)
 
 ## 6.6 Mockups de alta fidelidade (aplicação real)
 
-Capturas da aplicação em funcionamento, que substituem os protótipos de média fidelidade do PIT I. Celular: 390 px de largura; desktop: 1280 px.
+Capturas da aplicação em funcionamento, geradas automaticamente com `npm run telas` (script `scripts/capturar-telas.mjs`), que substituem os protótipos de média fidelidade do PIT I. Celular: 390 px de largura; desktop: 1280 px.
 
 ### Jornada do cliente (celular)
 

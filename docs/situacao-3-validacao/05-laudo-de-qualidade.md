@@ -1,10 +1,10 @@
-# Laudo de Qualidade — Doce Nuvem Cupcakes
+# Laudo de Qualidade — CruzCake Cupcakes
 
 ## 1. Identificação
 
 | Item | Informação |
 |---|---|
-| Sistema | Doce Nuvem Cupcakes: loja virtual com vitrine, carrinho, checkout (PIX/cartão simulados), acompanhamento de pedidos e painel administrativo |
+| Sistema | CruzCake Cupcakes: loja virtual com vitrine, carrinho, checkout (PIX/cartão simulados), acompanhamento de pedidos e painel administrativo |
 | Versão avaliada | [preencher: tag/commit, ex.: `v1.0` / `abc1234`] |
 | Versão após correções | [preencher: tag/commit] |
 | URL de teste | [LINK DO APP] |
@@ -112,7 +112,7 @@ As melhorias incorporadas também devem ser refletidas na documentação: histó
 
 [preencher após a rodada de testes. Modelo:]
 
-> Com base nos testes automatizados (52/52 aprovados), na execução de [N]/22 casos de teste de sistema e na avaliação de 5 usuários, a versão [versão] da Doce Nuvem Cupcakes **[atende / atende com ressalvas / não atende]** aos requisitos definidos. Foram corrigidos [N] defeitos ([N] de gravidade alta) e incorporadas [N] melhorias sugeridas. Permanecem [N] pendências de baixa gravidade, justificadas na seção 6, que não impedem o uso da solução.
+> Com base nos testes automatizados (52/52 aprovados), na execução de [N]/22 casos de teste de sistema e na avaliação de 5 usuários, a versão [versão] da CruzCake Cupcakes **[atende / atende com ressalvas / não atende]** aos requisitos definidos. Foram corrigidos [N] defeitos ([N] de gravidade alta) e incorporadas [N] melhorias sugeridas. Permanecem [N] pendências de baixa gravidade, justificadas na seção 6, que não impedem o uso da solução.
 
 Data: [preencher]
 Responsável: Guilherme Henrique Dalla Rosa

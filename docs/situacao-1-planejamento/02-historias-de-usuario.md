@@ -1,4 +1,4 @@
-# Histórias de Usuário — Doce Nuvem Cupcakes
+# Histórias de Usuário — CruzCake Cupcakes
 
 > Versão revisada (PIT II) dos cartões de história levantados no PIT I. Os cartões seguem o template do material do curso (Tabela 1 — Template de Cartão de História do Usuário), com um campo extra **Status no MVP**, que indica se a história foi implementada nesta entrega ou ficou no backlog para evoluções futuras.
 

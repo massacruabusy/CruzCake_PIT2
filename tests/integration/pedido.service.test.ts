@@ -44,7 +44,7 @@ const cartaoOk = { numero: "4111111111111111", nomeImpresso: "CLIENTE TESTE", va
 beforeEach(async () => {
   db = await criarDbEmMemoria();
   await semearBanco(db);
-  const u = await db.query.usuarios.findFirst({ where: eq(usuarios.email, "cliente@docenuvem.com.br") });
+  const u = await db.query.usuarios.findFirst({ where: eq(usuarios.email, "cliente@cruzcake.com.br") });
   clienteId = u!.id;
 });
 
@@ -59,11 +59,11 @@ describe("Autenticação", () => {
   });
   it("impede e-mail duplicado", async () => {
     await expect(
-      cadastrarUsuario(db, { nome: "Outro", email: "cliente@docenuvem.com.br", senha: "Senha1234" }),
+      cadastrarUsuario(db, { nome: "Outro", email: "cliente@cruzcake.com.br", senha: "Senha1234" }),
     ).rejects.toMatchObject({ codigo: "EMAIL_JA_CADASTRADO" });
   });
   it("recusa senha errada com mensagem genérica", async () => {
-    await expect(autenticar(db, "cliente@docenuvem.com.br", "errada123")).rejects.toMatchObject({
+    await expect(autenticar(db, "cliente@cruzcake.com.br", "errada123")).rejects.toMatchObject({
       codigo: "CREDENCIAIS_INVALIDAS",
     });
   });

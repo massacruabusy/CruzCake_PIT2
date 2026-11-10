@@ -73,6 +73,6 @@ export function processarCartaoSimulado(cartao: DadosCartao, agora: Date = new D
 export function gerarPixSimulado(pedidoId: number, totalCentavos: number) {
   const codigoTransacao = `PIX-${randomUUID()}`;
   const valor = (totalCentavos / 100).toFixed(2);
-  const pixCopiaECola = `00020126580014BR.GOV.BCB.PIX0136doce-nuvem-cupcakes@exemplo.com5204000053039865406${valor}5802BR5920DOCE NUVEM CUPCAKES6009SAO PAULO62140510PED${String(pedidoId).padStart(6, "0")}6304SIMU`;
+  const pixCopiaECola = `00020126580014BR.GOV.BCB.PIX0136cruzcake@exemplo.com5204000053039865406${valor}5802BR5920CRUZCAKE CUPCAKES6009SAO PAULO62140510PED${String(pedidoId).padStart(6, "0")}6304SIMU`;
   return { codigoTransacao, pixCopiaECola };
 }
