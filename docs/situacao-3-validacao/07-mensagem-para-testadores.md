@@ -10,6 +10,11 @@ Logins:
 • Admin: admin@cruzcake.com.br / Admin1234
 Cartão teste: 4111 1111 1111 1111 (aprovado) · 4000 0000 0002 0000 (recusado) · 12/30 · CVV 123
 
+Se puder, escolhe um papel:
+• Visitante: ainda sem conta, decidindo se compra
+• Cliente: fazendo e acompanhando pedidos
+• Admin: dono(a) da loja cuidando de produtos e pedidos
+
 Preenche e me devolve aqui (com prints do que der errado):
 
 Nome:
