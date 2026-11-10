@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { painel } from "@/controllers/admin.controller";
 import { formatarCentavos } from "@/models/regras/dinheiro";
+import { garantirAdminNaPagina } from "@/lib/guardas";
 
 export const metadata: Metadata = { title: "Painel da loja" };
 
 export default async function PaginaPainel() {
+  await garantirAdminNaPagina("/admin");
   const r = await painel();
   const indicadores = [
     { rotulo: "Pedidos em aberto", valor: String(r.pedidosEmAberto), href: "/admin/pedidos" },

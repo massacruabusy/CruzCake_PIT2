@@ -5,8 +5,10 @@ import { DetalhePedido } from "@/components/DetalhePedido";
 import { ErroNegocio } from "@/models/erros";
 import { proximosStatusPossiveis } from "@/models/regras/pedido";
 import { AcoesStatusAdmin } from "./AcoesStatusAdmin";
+import { garantirAdminNaPagina } from "@/lib/guardas";
 
 export default async function PaginaPedidoAdmin(props: PageProps<"/admin/pedidos/[id]">) {
+  await garantirAdminNaPagina("/admin/pedidos");
   const { id } = await props.params;
   let pedido;
   try {

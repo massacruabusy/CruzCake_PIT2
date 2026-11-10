@@ -4,10 +4,12 @@ import { pedidos } from "@/controllers/admin.controller";
 import { SeloStatus } from "@/components/StatusPedido";
 import { formatarCentavos } from "@/models/regras/dinheiro";
 import { ROTULO_STATUS } from "@/models/regras/pedido";
+import { garantirAdminNaPagina } from "@/lib/guardas";
 
 export const metadata: Metadata = { title: "Pedidos" };
 
 export default async function PaginaPedidosAdmin(props: PageProps<"/admin/pedidos">) {
+  await garantirAdminNaPagina("/admin/pedidos");
   const { status } = await props.searchParams;
   const filtro = typeof status === "string" ? status : undefined;
   const lista = await pedidos(filtro);

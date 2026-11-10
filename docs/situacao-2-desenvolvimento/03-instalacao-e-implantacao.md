@@ -22,6 +22,8 @@ Acesse http://localhost:3000. O comando `dev` aplica as migrações e o seed no 
 | `npm run db:reset` | Apaga o banco local e recria do zero |
 | `npm run db:generate` | Gera nova migração após mudar `src/models/db/schema.ts` |
 
+> ⚠️ O banco local (PGlite) aceita **um processo por vez**. **Pare o `npm run dev` antes de rodar `db:setup` ou `db:reset`** e suba de novo depois. Se os dois rodarem juntos, o servidor continua com os dados antigos (ex.: senha nova recusada no login).
+
 ## Variáveis de ambiente
 
 | Variável | Obrigatória em produção | Descrição |

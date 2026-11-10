@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { formularioProduto } from "@/controllers/admin.controller";
 import { ErroNegocio } from "@/models/erros";
 import { FormularioProduto } from "../FormularioProduto";
+import { garantirAdminNaPagina } from "@/lib/guardas";
 
 async function imagensDisponiveis() {
   const arquivos = await readdir(path.join(process.cwd(), "public", "img", "cupcakes"));
@@ -11,6 +12,7 @@ async function imagensDisponiveis() {
 }
 
 export default async function PaginaEditarProduto(props: PageProps<"/admin/produtos/[id]">) {
+  await garantirAdminNaPagina("/admin/produtos");
   const { id } = await props.params;
   const ehNovo = id === "novo";
   let dados;

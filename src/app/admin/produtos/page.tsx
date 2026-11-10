@@ -3,10 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { produtos } from "@/controllers/admin.controller";
 import { formatarCentavos } from "@/models/regras/dinheiro";
+import { garantirAdminNaPagina } from "@/lib/guardas";
 
 export const metadata: Metadata = { title: "Produtos" };
 
 export default async function PaginaProdutosAdmin() {
+  await garantirAdminNaPagina("/admin/produtos");
   const lista = await produtos();
   return (
     <div className="flex flex-col gap-4">
