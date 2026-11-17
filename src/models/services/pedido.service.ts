@@ -55,6 +55,7 @@ export async function criarPedido(db: DB, usuarioId: number, dados: DadosCheckou
     const carrinho = await precificarCarrinho(tx, dados.itens, {
       tipoEntrega: dados.tipoEntrega,
       codigoCupom: dados.codigoCupom,
+      cep: dados.tipoEntrega === "ENTREGA" ? dados.endereco?.cep : null,
       estrito: true,
     });
 
@@ -90,6 +91,7 @@ export async function criarPedido(db: DB, usuarioId: number, dados: DadosCheckou
         entregaBairro: end?.bairro ?? null,
         entregaCidade: end?.cidade ?? null,
         entregaUf: end?.uf?.toUpperCase() ?? null,
+        zonaEntregaId: carrinho.entrega?.zona?.id ?? null,
         cupomId: carrinho.cupom?.id ?? null,
         subtotalCentavos: carrinho.subtotalCentavos,
         descontoCentavos: carrinho.descontoCentavos,

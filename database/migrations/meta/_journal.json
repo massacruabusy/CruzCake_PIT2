@@ -8,6 +8,13 @@
       "when": 1794268999620,
       "tag": "0000_estrutura_inicial",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794271830537,
+      "tag": "0001_zonas_de_entrega",
+      "breakpoints": true
     }
   ]
 }

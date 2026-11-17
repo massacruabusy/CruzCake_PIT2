@@ -56,10 +56,31 @@ export const itensCarrinhoSchema = z
   )
   .max(50);
 
+const cepSchema = z
+  .string()
+  .transform((v) => v.replace(/\D/g, ""))
+  .pipe(z.string().length(8, { error: "CEP deve ter 8 dígitos." }));
+
 export const precificarSchema = z.object({
   itens: itensCarrinhoSchema,
   tipoEntrega: z.enum(["ENTREGA", "RETIRADA"]).default("ENTREGA"),
   codigoCupom: z.string().trim().max(30).optional().nullable(),
+  cep: z.string().max(9).optional().nullable(),
+});
+
+export const cotacaoSchema = z.object({
+  cep: cepSchema,
+  baseCentavos: z.coerce.number().int().min(0).max(10_000_000).default(0),
+});
+
+export const zonaSchema = z.object({
+  nome: texto(3, 80, "Nome da zona"),
+  cepInicial: cepSchema,
+  cepFinal: cepSchema,
+  valorCentavos: z.coerce.number({ error: "Valor inválido." }).int().min(0, { error: "O frete não pode ser negativo." }).max(100000),
+  freteGratisAPartirCentavos: z.coerce.number().int().positive({ error: "Informe um valor maior que zero ou deixe em branco." }).nullable(),
+  prazoHoras: z.coerce.number({ error: "Prazo inválido." }).int().min(1, { error: "Prazo mínimo de 1 hora." }).max(240),
+  ativo: z.boolean(),
 });
 
 export const enderecoSchema = z.object({

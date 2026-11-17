@@ -9,13 +9,13 @@
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import type { DB } from "../src/models/db/client";
-import { categorias, cupons, produtos, usuarios } from "../src/models/db/schema";
+import { categorias, cupons, produtos, usuarios, zonasEntrega } from "../src/models/db/schema";
 
 const CATEGORIAS = [
   { nome: "Clássicos", slug: "classicos", ordem: 1 },
-  { nome: "Gourmet", slug: "gourmet", ordem: 2 },
-  { nome: "Veganos e sem glúten", slug: "veganos-sem-gluten", ordem: 3 },
-  { nome: "Caixas e kits", slug: "caixas-e-kits", ordem: 4 },
+  { nome: "Caixas e kits", slug: "caixas-e-kits", ordem: 2 },
+  { nome: "Gourmet", slug: "gourmet", ordem: 3 },
+  { nome: "Veganos e sem glúten", slug: "veganos-sem-gluten", ordem: 4 },
 ];
 
 type ProdutoSeed = {
@@ -50,7 +50,9 @@ const PRODUTOS: ProdutoSeed[] = [
 export async function semearBanco(db: DB, opcoes: { log?: boolean } = {}) {
   const existentes = await db.select({ id: categorias.id }).from(categorias).limit(1);
   if (existentes.length > 0) {
-    if (opcoes.log) console.log("Seed: banco já possui dados, nada a fazer.");
+    // Banco que já estava em uso (ex.: produção da v1): só aplica os dados novos da v2.
+    await semearDadosV2(db, opcoes);
+    if (opcoes.log) console.log("Seed: catálogo já existente mantido.");
     return;
   }
 
@@ -83,7 +85,29 @@ export async function semearBanco(db: DB, opcoes: { log?: boolean } = {}) {
     { nome: "Cliente Demonstração", email: "cliente@cruzcake.com.br", senhaHash: await bcrypt.hash("Cliente1234", 10), telefone: "(11) 91234-5678", papel: "CLIENTE" },
   ]);
 
-  if (opcoes.log) console.log(`Seed: ${CATEGORIAS.length} categorias, ${PRODUTOS.length} produtos, 3 cupons e 2 usuários criados.`);
+  await semearDadosV2(db);
+
+  if (opcoes.log) console.log(`Seed: ${CATEGORIAS.length} categorias, ${PRODUTOS.length} produtos, 3 cupons, 3 zonas de entrega e 2 usuários criados.`);
+}
+
+/**
+ * Dados introduzidos na v2 (idempotente): zonas de entrega iniciais (se não houver nenhuma)
+ * e "Caixas e kits" como segunda categoria nos filtros.
+ */
+async function semearDadosV2(db: DB, opcoes: { log?: boolean } = {}) {
+  const zonas = await db.select({ id: zonasEntrega.id }).from(zonasEntrega).limit(1);
+  if (zonas.length === 0) {
+    // Zonas de entrega (RN02). O CEP 08000-000 a 08499-999 está em duas zonas: vale a mais específica.
+    await db.insert(zonasEntrega).values([
+      { nome: "Centro expandido (SP)", cepInicial: "01000000", cepFinal: "05999999", valorCentavos: 990, freteGratisAPartirCentavos: 12000, prazoHoras: 2 },
+      { nome: "Zona Leste (SP)", cepInicial: "08000000", cepFinal: "08499999", valorCentavos: 1490, freteGratisAPartirCentavos: 18000, prazoHoras: 3 },
+      { nome: "Grande São Paulo", cepInicial: "06000000", cepFinal: "09999999", valorCentavos: 1990, freteGratisAPartirCentavos: null, prazoHoras: 4 },
+    ]);
+    if (opcoes.log) console.log("Seed: 3 zonas de entrega criadas.");
+  }
+  for (const cat of CATEGORIAS) {
+    await db.update(categorias).set({ ordem: cat.ordem }).where(eq(categorias.slug, cat.slug));
+  }
 }
 
 /**

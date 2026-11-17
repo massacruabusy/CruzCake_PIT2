@@ -88,6 +88,18 @@ classDiagram
     +String pixCopiaECola
     +String cartaoFinal
   }
+  class ZonaEntrega {
+    +int id
+    +String nome
+    +String cepInicial
+    +String cepFinal
+    +int valorCentavos
+    +int freteGratisAPartirCentavos
+    +int prazoHoras
+    +bool ativo
+    +cobre(cep) bool
+    +calcularFrete(base) int
+  }
   class HistoricoStatusPedido {
     +int id
     +StatusPedido status
@@ -119,6 +131,7 @@ classDiagram
   Pedido "1" *-- "1" Pagamento : é pago por
   Pedido "1" *-- "1..*" HistoricoStatusPedido : registra
   Pedido "0..*" --> "0..1" Cupom : aplica
+  Pedido "0..*" --> "0..1" ZonaEntrega : é entregue na
   Usuario ..> PapelUsuario
   Pedido ..> StatusPedido
 ```
@@ -127,6 +140,7 @@ classDiagram
 
 - **Composição** (`*--`) entre Pedido e ItemPedido/Pagamento/Histórico: essas partes não existem sem o pedido (no banco, `ON DELETE CASCADE`).
 - **Agregação** (`o--`) entre Usuário e Endereço: o endereço pertence ao usuário, mas o pedido guarda uma **cópia** do endereço, então apagar o endereço não afeta pedidos antigos.
+- **Associação** entre Pedido e ZonaEntrega (0..1): só pedidos de entrega têm zona. O pedido guarda o valor do frete cobrado; a ligação com a zona serve para relatórios (`ON DELETE SET NULL`).
 - **Associação** entre ItemPedido e Produto: o item mantém o nome e o preço do momento da compra (snapshot), mas continua ligado ao produto para relatórios.
 
 ## 5.2 Diagrama de classes da arquitetura (MVC)
@@ -237,8 +251,11 @@ sequenceDiagram
   PC->>PS: criarPedido(usuarioId, dados)
   PS->>DB: BEGIN
   PS->>CS: precificarCarrinho(estrito)
-  CS->>DB: SELECT produtos e cupom
-  CS-->>PS: itens, subtotal, desconto, frete, total
+  CS->>DB: SELECT produtos, cupom e zonas_entrega
+  alt CEP fora das zonas de entrega
+    CS-->>V: 422 ENTREGA_INDISPONIVEL ("Ainda não entregamos neste CEP...")
+  end
+  CS-->>PS: itens, subtotal, desconto, frete da zona, total
   loop para cada item
     PS->>DB: UPDATE produtos SET estoque = estoque - qtd WHERE estoque >= qtd
     alt nenhuma linha atualizada
@@ -330,7 +347,46 @@ sequenceDiagram
   end
 ```
 
-## 5.6 Diagrama de atividades — Processo de compra
+## 5.6 Diagrama de sequência — Cotar frete pelo CEP (visitante)
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor V as Visitante
+  participant W as CotacaoFrete (View)
+  participant R as GET /api/frete
+  participant LC as loja.controller
+  participant FS as frete.service (Model)
+  participant CS as cep.service (Model)
+  participant EXT as ViaCEP / BrasilAPI
+  participant DB as PostgreSQL
+
+  V->>W: Digita o CEP e clica em "Calcular"
+  W->>R: fetch(cep, base = produtos com desconto)
+  R->>LC: cotacaoFrete(cep, base)
+  LC->>LC: validar(cotacaoSchema) - 8 dígitos
+  par cotação e endereço
+    LC->>FS: cotarFrete(cep, base)
+    FS->>DB: SELECT zonas_entrega WHERE ativo
+    FS->>FS: encontrarZona (faixa mais específica) e calcularFrete
+  and
+    LC->>CS: consultarCep(cep)
+    CS->>EXT: GET ViaCEP (reserva: BrasilAPI)
+    EXT-->>CS: logradouro, bairro, cidade, UF
+  end
+  alt CEP inexistente
+    LC-->>W: 400 "CEP não encontrado. Confira os números."
+  else loja não entrega no CEP
+    LC-->>W: disponivel = false + endereço
+    W-->>V: "Ainda não entregamos no CEP... retire na loja sem custo"
+  else CEP atendido
+    LC-->>W: zona, prazo, frete, endereço
+    W->>W: guarda o CEP no navegador
+    W-->>V: "Entregamos! Zona Leste (SP): em até 3h, por R$ 14,90"
+  end
+```
+
+## 5.7 Diagrama de atividades — Processo de compra
 
 ```mermaid
 flowchart TD
@@ -348,7 +404,10 @@ flowchart TD
   conta -- Sim --> login[Entrar] --> checkout
   logado -- Sim --> checkout[Checkout]
   checkout --> tipo{Entrega ou retirada?}
-  tipo -- Entrega --> cep[Informar CEP e endereço] --> pagamento
+  tipo -- Entrega --> cep[Informar CEP e endereço] --> frete[Calcular frete pelo CEP]
+  frete --> atendido{CEP atendido?}
+  atendido -- Não --> foraArea[Avisar que não entrega no CEP] --> tipo
+  atendido -- Sim --> pagamento
   tipo -- Retirada --> pagamento{Forma de pagamento}
   pagamento -- PIX --> pix[Gerar código PIX] --> aguarda[Pedido aguardando pagamento]
   aguarda --> pagou{Pagamento confirmado?}
@@ -364,7 +423,7 @@ flowchart TD
   entregue --> fim
 ```
 
-## 5.7 Diagrama de máquina de estados — Pedido (RN07)
+## 5.8 Diagrama de máquina de estados — Pedido (RN07)
 
 ```mermaid
 stateDiagram-v2

@@ -4,13 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { MAX_POR_ITEM, useCarrinho } from "@/components/CarrinhoProvider";
+import { CotacaoFrete } from "@/components/CotacaoFrete";
 import { ResumoValores } from "@/components/ResumoValores";
 import { usePrecificacao } from "@/components/usePrecificacao";
 import { formatarCentavos } from "@/models/regras/dinheiro";
 
 export function TelaCarrinho({ logado }: { logado: boolean }) {
-  const { itens, alterarQuantidade, remover, cupom, carregado, avisar } = useCarrinho();
-  const { dados, erro, carregando } = usePrecificacao("ENTREGA");
+  const { itens, alterarQuantidade, remover, cupom, cep, carregado, avisar } = useCarrinho();
+  const { dados, erro, carregando } = usePrecificacao("ENTREGA", cep);
 
   if (!carregado) return <p>Carregando carrinho…</p>;
 
@@ -77,8 +78,9 @@ export function TelaCarrinho({ logado }: { logado: boolean }) {
 
       <aside className="cartao flex h-fit flex-col gap-4" aria-label="Resumo do pedido">
         <FormCupom key={cupom} erroCupom={dados?.erroCupom ?? null} cupomAplicado={dados?.cupom?.codigo ?? null} />
-        {dados && <ResumoValores {...dados} />}
-        <p className="text-xs text-stone-500">Frete estimado para entrega. Na retirada na loja o frete é grátis.</p>
+        <CotacaoFrete compacto baseCentavos={dados ? dados.subtotalCentavos - dados.descontoCentavos : 0} />
+        {dados && <ResumoValores {...dados} freteCalculado={Boolean(dados.entrega?.disponivel)} />}
+        <p className="text-xs text-stone-500">Na retirada na loja o frete é sempre grátis.</p>
         <Link
           href={logado ? "/checkout" : "/entrar?voltar=/checkout"}
           aria-disabled={temProblema || carregando}

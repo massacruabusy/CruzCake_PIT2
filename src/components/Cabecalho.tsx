@@ -9,7 +9,7 @@ import { chamarApi } from "@/lib/api-cliente";
 import type { Sessao } from "@/lib/sessao";
 
 export function Cabecalho({ sessao }: { sessao: Sessao | null }) {
-  const { totalItens, carregado } = useCarrinho();
+  const { totalItens, carregado, abrirMini } = useCarrinho();
   const router = useRouter();
   const [menuAberto, setMenuAberto] = useState(false);
 
@@ -65,8 +65,10 @@ export function Cabecalho({ sessao }: { sessao: Sessao | null }) {
               </div>
             )}
           </div>
-          <Link
-            href="/carrinho"
+          <button
+            type="button"
+            onClick={abrirMini}
+            aria-haspopup="dialog"
             className="relative rounded-full bg-marca-600 px-4 py-2 text-sm font-bold text-white hover:bg-marca-700"
             aria-label={`Carrinho com ${totalItens} ${totalItens === 1 ? "item" : "itens"}`}
           >
@@ -76,7 +78,7 @@ export function Cabecalho({ sessao }: { sessao: Sessao | null }) {
                 {totalItens}
               </span>
             )}
-          </Link>
+          </button>
         </nav>
       </div>
     </header>

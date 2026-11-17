@@ -7,6 +7,7 @@ import { eq, inArray } from "drizzle-orm";
 import type { DB } from "../db/client";
 import { cupons, produtos, type Cupom, type TipoEntrega } from "../db/schema";
 import { ErroNegocio } from "../erros";
+import { listarZonas, montarCotacao, type CotacaoFrete } from "./frete.service";
 import { calcularDescontoCupom, calcularTotais, QUANTIDADE_MAXIMA_POR_ITEM, type Totais } from "../regras/pedido";
 
 export interface ItemCarrinhoEntrada {
@@ -36,6 +37,8 @@ export interface CarrinhoPrecificado extends Totais {
   problemas: ProblemaCarrinho[];
   cupom: { id: number; codigo: string } | null;
   erroCupom: string | null;
+  /** Cotação de entrega para o CEP informado (null se retirada ou CEP ainda não informado). */
+  entrega: CotacaoFrete | null;
 }
 
 /** Junta linhas repetidas do mesmo produto. */
@@ -56,7 +59,7 @@ export async function buscarCupomPorCodigo(db: DB, codigo: string): Promise<Cupo
 export async function precificarCarrinho(
   db: DB,
   entrada: ItemCarrinhoEntrada[],
-  opcoes: { tipoEntrega?: TipoEntrega; codigoCupom?: string | null; estrito?: boolean } = {},
+  opcoes: { tipoEntrega?: TipoEntrega; codigoCupom?: string | null; cep?: string | null; estrito?: boolean } = {},
 ): Promise<CarrinhoPrecificado> {
   const tipoEntrega = opcoes.tipoEntrega ?? "ENTREGA";
   const itensEntrada = consolidar(entrada.filter((i) => i.quantidade !== 0));
@@ -133,5 +136,31 @@ export async function precificarCarrinho(
     }
   }
 
-  return { itens, problemas, cupom, erroCupom, ...calcularTotais(subtotal, descontoCentavos, tipoEntrega) };
+  // RN02 — frete pela zona de entrega do CEP.
+  let entrega: CotacaoFrete | null = null;
+  const cep = opcoes.cep?.replace(/\D/g, "") ?? "";
+  if (tipoEntrega === "ENTREGA" && cep.length === 8) {
+    entrega = montarCotacao(await listarZonas(db, true), cep, subtotal - descontoCentavos);
+  }
+  if (opcoes.estrito && tipoEntrega === "ENTREGA") {
+    if (cep.length !== 8) {
+      throw new ErroNegocio("VALIDACAO", "Informe o CEP de entrega.", { "endereco.cep": "CEP obrigatório para entrega." });
+    }
+    if (!entrega?.disponivel) {
+      throw new ErroNegocio(
+        "ENTREGA_INDISPONIVEL",
+        "Ainda não entregamos neste CEP. Escolha retirar na loja ou use outro endereço.",
+        { "endereco.cep": "Fora da nossa área de entrega." },
+      );
+    }
+  }
+
+  return {
+    itens,
+    problemas,
+    cupom,
+    erroCupom,
+    entrega,
+    ...calcularTotais(subtotal, descontoCentavos, tipoEntrega, entrega?.disponivel ? entrega.zona : null),
+  };
 }

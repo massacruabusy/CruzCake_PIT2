@@ -104,7 +104,7 @@ export function FormularioProduto({ categorias, imagens, produto }: Props) {
             <label key={src} className={`cursor-pointer rounded-xl border-2 p-1 ${imagem === src ? "border-marca-600" : "border-transparent"}`}>
               <input type="radio" name="imagem" value={src} checked={imagem === src} onChange={() => setImagem(src)} className="sr-only" />
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt={src.split("/").pop()?.replace(".svg", "")} width={56} height={56} className="rounded-lg" />
+              <img src={src} alt={src.split("/").pop()?.replace(/\.\w+$/, "")} width={56} height={56} className="rounded-lg" />
             </label>
           ))}
         </div>

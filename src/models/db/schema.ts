@@ -131,6 +131,31 @@ export const cupons = pgTable(
   ],
 );
 
+/**
+ * Zonas de entrega cadastradas pela loja (RN02). Cada zona cobre uma faixa de CEPs.
+ * Se um CEP cair em mais de uma zona, vale a faixa mais específica (menor intervalo).
+ */
+export const zonasEntrega = pgTable(
+  "zonas_entrega",
+  {
+    id: serial("id").primaryKey(),
+    nome: varchar("nome", { length: 80 }).notNull(),
+    cepInicial: char("cep_inicial", { length: 8 }).notNull(),
+    cepFinal: char("cep_final", { length: 8 }).notNull(),
+    valorCentavos: integer("valor_centavos").notNull(),
+    freteGratisAPartirCentavos: integer("frete_gratis_a_partir_centavos"),
+    prazoHoras: integer("prazo_horas").notNull(),
+    ativo: boolean("ativo").notNull().default(true),
+    criadoEm: timestamp("criado_em", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    check("zonas_cep_ck", sql`${t.cepInicial} ~ '^[0-9]{8}$' AND ${t.cepFinal} ~ '^[0-9]{8}$' AND ${t.cepInicial} <= ${t.cepFinal}`),
+    check("zonas_valor_ck", sql`${t.valorCentavos} >= 0`),
+    check("zonas_prazo_ck", sql`${t.prazoHoras} > 0`),
+    index("zonas_faixa_idx").on(t.cepInicial, t.cepFinal),
+  ],
+);
+
 export const pedidos = pgTable(
   "pedidos",
   {
@@ -148,6 +173,7 @@ export const pedidos = pgTable(
     entregaBairro: varchar("entrega_bairro", { length: 80 }),
     entregaCidade: varchar("entrega_cidade", { length: 80 }),
     entregaUf: char("entrega_uf", { length: 2 }),
+    zonaEntregaId: integer("zona_entrega_id").references(() => zonasEntrega.id, { onDelete: "set null" }),
     cupomId: integer("cupom_id").references(() => cupons.id, { onDelete: "set null" }),
     subtotalCentavos: integer("subtotal_centavos").notNull(),
     descontoCentavos: integer("desconto_centavos").notNull().default(0),
@@ -275,3 +301,4 @@ export type StatusPedido = (typeof statusPedidoEnum.enumValues)[number];
 export type TipoEntrega = (typeof tipoEntregaEnum.enumValues)[number];
 export type MetodoPagamento = (typeof metodoPagamentoEnum.enumValues)[number];
 export type PapelUsuario = (typeof papelUsuarioEnum.enumValues)[number];
+export type ZonaEntrega = typeof zonasEntrega.$inferSelect;

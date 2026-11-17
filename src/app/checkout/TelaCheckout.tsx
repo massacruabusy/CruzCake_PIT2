@@ -8,6 +8,7 @@ import { CampoTexto } from "@/components/CampoTexto";
 import { ResumoValores } from "@/components/ResumoValores";
 import { usePrecificacao } from "@/components/usePrecificacao";
 import { chamarApi, ErroApi } from "@/lib/api-cliente";
+import type { CotacaoFrete as CotacaoFreteDados } from "@/models/services/frete.service";
 
 interface EnderecoSalvo {
   id: number;
@@ -42,7 +43,10 @@ export function TelaCheckout({ enderecos }: { enderecos: EnderecoSalvo[] }) {
   const [erroGeral, setErroGeral] = useState<{ mensagem: string; codigo: string } | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [buscandoCep, setBuscandoCep] = useState(false);
-  const { dados, carregando } = usePrecificacao(tipoEntrega);
+  const enderecoSalvo = enderecos.find((x) => x.id === enderecoId);
+  const cepEntrega = tipoEntrega === "ENTREGA" ? (enderecoSalvo?.cep ?? novo.cep.replace(/\D/g, "")) : "";
+  const { dados, carregando } = usePrecificacao(tipoEntrega, cepEntrega);
+  const entregaIndisponivel = tipoEntrega === "ENTREGA" && (!dados?.entrega || !dados.entrega.disponivel);
 
   if (carregado && itens.length === 0 && !enviando) {
     return (
@@ -58,16 +62,12 @@ export function TelaCheckout({ enderecos }: { enderecos: EnderecoSalvo[] }) {
     if (cep.length !== 8) return;
     setBuscandoCep(true);
     try {
-      const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-      const j = await r.json();
-      if (j.erro) {
-        setErros((e) => ({ ...e, "endereco.cep": "CEP não encontrado. Confira ou preencha o endereço manualmente." }));
-      } else {
-        setNovo((n) => ({ ...n, logradouro: j.logradouro || n.logradouro, bairro: j.bairro || n.bairro, cidade: j.localidade || n.cidade, uf: j.uf || n.uf }));
-        setErros((e) => ({ ...e, "endereco.cep": "" }));
-      }
-    } catch {
-      // Serviço de CEP fora do ar: o cliente preenche manualmente.
+      const j = await chamarApi<{ logradouro: string; bairro: string; cidade: string; uf: string }>(`/api/cep/${cep}`);
+      setNovo((n) => ({ ...n, logradouro: j.logradouro || n.logradouro, bairro: j.bairro || n.bairro, cidade: j.cidade || n.cidade, uf: j.uf || n.uf }));
+      setErros((e) => ({ ...e, "endereco.cep": "" }));
+    } catch (err) {
+      // CEP inexistente ou serviço fora do ar: o cliente pode preencher manualmente.
+      if (err instanceof ErroApi) setErros((e) => ({ ...e, "endereco.cep": err.message }));
     } finally {
       setBuscandoCep(false);
     }
@@ -120,6 +120,9 @@ export function TelaCheckout({ enderecos }: { enderecos: EnderecoSalvo[] }) {
         {erroGeral && (
           <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-800">
             <p className="font-bold">{erroGeral.mensagem}</p>
+            {erroGeral.codigo === "ENTREGA_INDISPONIVEL" && (
+              <button type="button" className="font-semibold underline" onClick={() => setTipoEntrega("RETIRADA")}>Mudar para retirada na loja</button>
+            )}
             {["ESTOQUE_INSUFICIENTE", "PRODUTO_INDISPONIVEL", "CUPOM_INVALIDO"].includes(erroGeral.codigo) && (
               <Link href="/carrinho" className="font-semibold underline">Voltar ao carrinho para ajustar</Link>
             )}
@@ -131,7 +134,7 @@ export function TelaCheckout({ enderecos }: { enderecos: EnderecoSalvo[] }) {
           <div className="grid gap-3 sm:grid-cols-2">
             <label className={opcao(tipoEntrega === "ENTREGA")}>
               <input type="radio" name="tipoEntrega" checked={tipoEntrega === "ENTREGA"} onChange={() => setTipoEntrega("ENTREGA")} className="mt-1 accent-marca-600" />
-              <span><strong>Entrega</strong><br /><span className="text-sm text-stone-600">Hoje, em até 2h após o preparo</span></span>
+              <span><strong>Entrega</strong><br /><span className="text-sm text-stone-600">Prazo e valor conforme o CEP</span></span>
             </label>
             <label className={opcao(tipoEntrega === "RETIRADA")}>
               <input type="radio" name="tipoEntrega" checked={tipoEntrega === "RETIRADA"} onChange={() => setTipoEntrega("RETIRADA")} className="mt-1 accent-marca-600" />
@@ -158,6 +161,7 @@ export function TelaCheckout({ enderecos }: { enderecos: EnderecoSalvo[] }) {
                   </label>
                 </div>
               )}
+              {enderecoId !== "novo" && <AvisoEntrega dados={dados?.entrega ?? null} />}
               {enderecoId === "novo" && (
                 <div className="grid gap-3 sm:grid-cols-6">
                   <CampoTexto
@@ -178,6 +182,7 @@ export function TelaCheckout({ enderecos }: { enderecos: EnderecoSalvo[] }) {
                   <CampoTexto className="sm:col-span-2" nome="bairro" rotulo="Bairro" value={novo.bairro} onChange={(e) => setNovo({ ...novo, bairro: e.target.value })} erro={erros["endereco.bairro"]} />
                   <CampoTexto className="sm:col-span-3" nome="cidade" rotulo="Cidade" autoComplete="address-level2" value={novo.cidade} onChange={(e) => setNovo({ ...novo, cidade: e.target.value })} erro={erros["endereco.cidade"]} />
                   <CampoTexto className="sm:col-span-1" nome="uf" rotulo="UF" maxLength={2} value={novo.uf} onChange={(e) => setNovo({ ...novo, uf: e.target.value.toUpperCase() })} erro={erros["endereco.uf"]} />
+                  <div className="sm:col-span-6"><AvisoEntrega dados={dados?.entrega ?? null} /></div>
                   <label className="flex items-center gap-2 text-sm sm:col-span-6">
                     <input type="checkbox" checked={salvarEndereco} onChange={(e) => setSalvarEndereco(e.target.checked)} className="accent-marca-600" />
                     Salvar este endereço para as próximas compras
@@ -232,8 +237,8 @@ export function TelaCheckout({ enderecos }: { enderecos: EnderecoSalvo[] }) {
         </ul>
         {dados?.cupom && <p className="text-sm text-green-700">Cupom {dados.cupom.codigo} aplicado</p>}
         {dados?.erroCupom && <p className="text-sm text-red-700">{dados.erroCupom}</p>}
-        {dados && <ResumoValores {...dados} tipoEntrega={tipoEntrega} />}
-        <button className="btn-primario" disabled={enviando || carregando || (dados?.problemas.length ?? 0) > 0}>
+        {dados && <ResumoValores {...dados} tipoEntrega={tipoEntrega} freteCalculado={tipoEntrega === "RETIRADA" || Boolean(dados.entrega?.disponivel)} />}
+        <button className="btn-primario" disabled={enviando || carregando || entregaIndisponivel || (dados?.problemas.length ?? 0) > 0}>
           {enviando ? "Processando…" : metodo === "PIX" ? "Confirmar e gerar PIX" : "Pagar e confirmar pedido"}
         </button>
         {(dados?.problemas.length ?? 0) > 0 && (
@@ -243,5 +248,21 @@ export function TelaCheckout({ enderecos }: { enderecos: EnderecoSalvo[] }) {
         )}
       </aside>
     </form>
+  );
+}
+
+function AvisoEntrega({ dados }: { dados: CotacaoFreteDados | null }) {
+  if (!dados) return null;
+  if (!dados.disponivel || !dados.zona) {
+    return (
+      <p role="alert" className="rounded-lg bg-amber-50 p-2 text-sm text-amber-900">
+        Ainda não entregamos neste CEP. Escolha <strong>Retirar na loja</strong> ou use outro endereço.
+      </p>
+    );
+  }
+  return (
+    <p className="rounded-lg bg-green-50 p-2 text-sm text-green-900">
+      Entregamos! {dados.zona.nome}: em até {dados.zona.prazoHoras}h após o preparo.
+    </p>
   );
 }

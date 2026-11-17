@@ -14,6 +14,7 @@ export default async function LayoutAdmin({ children }: LayoutProps<"/admin">) {
           ["/admin", "Visão geral"],
           ["/admin/pedidos", "Pedidos"],
           ["/admin/produtos", "Produtos"],
+          ["/admin/frete", "Frete"],
         ].map(([href, rotulo]) => (
           <Link key={href} href={href} className="rounded-xl px-4 py-2 font-bold text-white hover:bg-white/10">
             {rotulo}

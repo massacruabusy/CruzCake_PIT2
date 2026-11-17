@@ -9,7 +9,7 @@ interface Props {
 }
 
 export function BotaoAdicionar({ produto, comQuantidade = false }: Props) {
-  const { adicionar, avisar, itens } = useCarrinho();
+  const { adicionar, avisar, itens, abrirMini } = useCarrinho();
   const [qtd, setQtd] = useState(1);
   const noCarrinho = itens.find((i) => i.produtoId === produto.id)?.quantidade ?? 0;
   const limite = Math.min(MAX_POR_ITEM, produto.estoque);
@@ -28,7 +28,7 @@ export function BotaoAdicionar({ produto, comQuantidade = false }: Props) {
       return;
     }
     adicionar({ produtoId: produto.id, nome: produto.nome, imagemUrl: produto.imagemUrl, precoCentavos: produto.precoCentavos }, qtd);
-    avisar(`${qtd}× ${produto.nome} adicionado ao carrinho`);
+    abrirMini();
     setQtd(1);
   }
 

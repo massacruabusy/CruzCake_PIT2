@@ -55,7 +55,7 @@ flowchart LR
 | **Código ↔ Teste unitário** | Regras puras do Model: frete, cupom, totais, máquina de estados, cancelamento, pagamento simulado (Luhn, validade, CVV, recusa), PIX, utilitários de dinheiro e texto. Também os contratos de validação do Controller (Zod) | Vitest, automatizado | `tests/unit/*.test.ts` |
 | **Arquitetura ↔ Teste de integração** | Serviços do Model rodando contra um **PostgreSQL real em memória (PGlite)**, com as mesmas migrações de produção: autenticação, vitrine, carrinho, checkout transacional (rollback), estoque, PIX, cancelamento, permissões e painel admin | Vitest + PGlite, automatizado | `tests/integration/*.test.ts` |
 | **Análise ↔ Teste de sistema** | Fluxos ponta a ponta no navegador, passando por View → Controller → Model → banco, incluindo mensagens de erro, responsividade e teclado | Roteiro manual | [02-casos-de-teste-manuais.md](02-casos-de-teste-manuais.md) |
-| **Requisitos ↔ Teste de aceitação** | Se a solução atende às necessidades de quem compra e de quem administra a loja | 5 testadores reais usando o app publicado e preenchendo o formulário | [03-formulario-teste-usuarios.md](03-formulario-teste-usuarios.md), [04-fichas-dos-testadores.md](04-fichas-dos-testadores.md) |
+| **Requisitos ↔ Teste de aceitação** | Se a solução atende às necessidades de quem compra e de quem administra a loja | 5 testadores reais usando o app publicado e devolvendo a ficha por Slack/WhatsApp (concluído em 12/11/2026) | [03-formulario-teste-usuarios.md](03-formulario-teste-usuarios.md), [04-fichas-dos-testadores.md](04-fichas-dos-testadores.md) |
 
 ## 5. Ferramentas e ambiente
 
@@ -109,24 +109,28 @@ Os testes não precisam de banco instalado, porque cada teste de integração cr
 
 ## 8. Resultado atual da execução automatizada
 
-Execução em 09/11/2026: **4 arquivos, 52 testes, 52 passando, 0 falhas.**
+Execução em 16/11/2026 (branch `v2-melhorias`, após as melhorias da validação): **5 arquivos, 63 testes, 63 passando, 0 falhas.**
+
+**Validação com usuários: concluída em 12/11/2026** (5 testadores; resultado no [laudo](05-laudo-de-qualidade.md)).
 
 | Arquivo | Grupo (`describe`) | Testes |
 |---|---|---|
-| `tests/unit/regras-pedido.test.ts` | RN02 — frete | 3 |
+| `tests/unit/regras-pedido.test.ts` | RN02 — frete por zona de entrega | 5 |
 | | RN05 — cupom de desconto | 7 |
-| | RN01 — totais | 2 |
+| | RN01 — totais | 3 |
 | | RN07 — máquina de estados do pedido (inclui RN08) | 5 |
 | `tests/unit/regras-pagamento.test.ts` | RN06 — pagamento simulado com cartão | 6 |
 | | PIX simulado | 1 |
 | | utilitários | 3 |
 | `tests/unit/validacoes.test.ts` | Validação de entrada (Controller) | 6 |
 | `tests/integration/pedido.service.test.ts` | Autenticação | 3 |
-| | Vitrine | 3 |
+| | Vitrine | 4 |
 | | Carrinho | 3 |
-| | Checkout e ciclo do pedido | 8 |
+| | Frete por CEP | 4 |
+| | Checkout e ciclo do pedido | 10 |
 | | Administração | 2 |
-| **Total** | | **52** |
+| `tests/integration/seed-upgrade.test.ts` | Atualização do banco da v1 para a v2 | 1 |
+| **Total** | | **63** |
 
 Para anexar como evidência, salve a saída do terminal em `evidencias/TESTES-AUTOMATIZADOS_saida.png` (print) ou `.txt`.
 
@@ -136,15 +140,15 @@ A coluna HU indica o tema da história de usuário. Os IDs exatos estão no back
 
 | Regra / requisito | HU (tema) | Testes automatizados (nome do teste) | Caso manual |
 |---|---|---|---|
-| **RN01** Totais em centavos (total = subtotal − desconto + frete) | HU (Carrinho / Checkout) | "total = subtotal − desconto + frete"; "frete grátis é avaliado depois do desconto"; "recalcula preços no servidor e aplica cupom"; "formata centavos em reais"; "converte texto em reais para centavos" | CT-02, CT-06 |
-| **RN02** Frete fixo R$ 9,90, grátis a partir de R$ 120, retirada sem frete | HU (Entrega) | "retirada na loja não cobra frete"; "entrega abaixo de R$ 120 cobra frete fixo"; "entrega a partir de R$ 120 tem frete grátis"; "entrega exige endereço; retirada não cobra frete" | CT-06, CT-11 |
+| **RN01** Totais em centavos (total = subtotal − desconto + frete) | HU (Carrinho / Checkout) | "total = subtotal − desconto + frete"; "frete grátis é avaliado depois do desconto"; "retirada na loja e entrega ainda sem CEP não somam frete"; "recalcula preços no servidor e aplica cupom"; "formata centavos em reais"; "converte texto em reais para centavos" | CT-02, CT-06 |
+| **RN02** Frete por zona de entrega (faixa de CEP, faixa mais específica, frete grátis por zona, CEP fora da área só retirada) | US11, US33, US34 | 5 testes do grupo "RN02 — frete por zona de entrega"; "cota frete e prazo de um CEP atendido"; "informa quando a loja não entrega no CEP"; "administração cria nova zona e ela passa a valer"; "recusa faixa de CEP invertida"; "bloqueia entrega para CEP fora das zonas, sem criar pedido"; "pedido de entrega guarda o frete da zona"; "entrega exige endereço; retirada não cobra frete" | CT-06, CT-11, CT-23, CT-24, CT-25, CT-26, CT-27 |
 | **RN03** Estoque: não vender acima do disponível, baixa na compra, devolução no cancelamento | HU (Estoque / Checkout) | "aponta produto esgotado e quantidade acima do estoque"; "não vende acima do estoque"; "pedido com cartão aprovado nasce PAGO, baixa estoque e registra histórico"; "cartão recusado não cria pedido nem baixa estoque (rollback)"; "cancelamento pelo cliente devolve o estoque; após preparo não pode cancelar" | CT-01, CT-09, CT-10, CT-13 |
 | **RN04** Limite de 24 unidades por item | HU (Carrinho) | "recusa carrinho vazio e quantidade acima do limite" | CT-10 |
 | **RN05** Cupom: ativo, dentro da validade, valor mínimo, desconto ≤ subtotal | HU (Promoções) | 7 testes do grupo "RN05 — cupom de desconto"; "informa cupom vencido sem quebrar o carrinho" | CT-07, CT-08 |
 | **RN06** Pagamento simulado (Luhn, validade, CVV, recusa terminada em 0000, PIX) | HU (Pagamento) | 6 testes do grupo "RN06 — pagamento simulado com cartão"; "gera código copia-e-cola com o valor do pedido"; "PIX: pedido aguarda pagamento e é liberado na confirmação"; "checkout com entrega exige endereço e cartão exige dados" | CT-01, CT-02, CT-12 |
 | **RN07** Máquina de estados do pedido | HU (Gestão de pedidos) | 4 testes do grupo "RN07"; "fluxo completo da loja até a entrega" | CT-03, CT-04, CT-14 |
 | **RN08** Cliente só cancela antes do preparo | HU (Acompanhamento do pedido) | "RN08 — cliente só cancela antes do preparo"; "cancelamento pelo cliente devolve o estoque; após preparo não pode cancelar" | CT-13 |
-| **RN09** Só produtos ativos na vitrine | HU (Vitrine / Gestão de produtos) | "lista apenas produtos ativos, com destaques primeiro"; "produto inativo não abre a página de detalhe" | CT-05, CT-16 |
+| **RN09** Vitrine e busca só com produtos ativos e com estoque | US04, US35 | "lista apenas produtos ativos, com destaques primeiro"; "RN09 — esgotados não aparecem na vitrine nem na busca, mas a página do produto informa"; "produto inativo não abre a página de detalhe" | CT-05, CT-09, CT-16, CT-28 |
 | **RN10** Senha com 8+ caracteres, letras e números | HU (Cadastro) | "RN10 — exige senha com letras e números"; "aponta confirmação de senha diferente no campo correto" | CT-17 |
 | Cadastro, login e e-mail único | HU (Conta do cliente) | "cadastra usuário com senha criptografada e permite login"; "impede e-mail duplicado"; "recusa senha errada com mensagem genérica" | CT-18 |
 | Privacidade e permissão de acesso | HU (Conta / Administração) | "cliente não enxerga pedido de outro cliente" | CT-15 |
@@ -152,3 +156,5 @@ A coluna HU indica o tema da história de usuário. Os IDs exatos estão no back
 | Painel administrativo | HU (Administração) | "cria produto com slug único"; "resumo do painel soma apenas pedidos pagos" | CT-14, CT-16 |
 | Endereço (CEP/UF normalizados) | HU (Entrega) | "normaliza CEP e UF do endereço" | CT-02 |
 | Usabilidade, acessibilidade, responsividade e persistência do carrinho | HU (Experiência do usuário) | (não automatizado) | CT-19, CT-20, CT-21, CT-22 |
+| Minicarrinho (abre ao adicionar, Esc fecha, ajusta itens) | US37 | (não automatizado) | CT-29 |
+| Kits identificáveis na vitrine | US36 | (não automatizado) | CT-30 |

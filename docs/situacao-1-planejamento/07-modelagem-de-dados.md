@@ -14,6 +14,7 @@ erDiagram
   PEDIDO ||--|| PAGAMENTO : "é pago por"
   PEDIDO ||--|{ HISTORICO_STATUS : "registra"
   CUPOM |o--o{ PEDIDO : "é aplicado em"
+  ZONA_ENTREGA |o--o{ PEDIDO : "atende"
 
   USUARIO {
     int id PK
@@ -55,10 +56,21 @@ erDiagram
     int valor_minimo_centavos
     timestamp valido_ate
   }
+  ZONA_ENTREGA {
+    int id PK
+    string nome
+    string cep_inicial
+    string cep_final
+    int valor_centavos
+    int frete_gratis_a_partir_centavos
+    int prazo_horas
+    bool ativo
+  }
   PEDIDO {
     int id PK
     int usuario_id FK
     int cupom_id FK
+    int zona_entrega_id FK
     enum status
     enum tipo_entrega
     int total_centavos
@@ -94,6 +106,7 @@ erDiagram
 | Produto — Item | 1 : N (0..N) | Um produto pode estar em vários pedidos; produto vendido não pode ser apagado (`ON DELETE RESTRICT`), apenas desativado (RN09) |
 | Pedido — Pagamento | 1 : 1 | Cada pedido tem uma tentativa de pagamento registrada (`UNIQUE pedido_id`) |
 | Cupom — Pedido | 0..1 : N | Pedido pode ter no máximo um cupom |
+| Zona de entrega — Pedido | 0..1 : N | Só pedidos de entrega têm zona; a zona é a que cobre o CEP no momento da compra (RN02). Zonas não se relacionam com endereços: a ligação é calculada pela faixa de CEP |
 
 ## 7.2 Modelo lógico (relacional, normalizado)
 
@@ -104,7 +117,8 @@ Notação: **sublinhado** = chave primária, *itálico* = chave estrangeira.
 - **categorias** (<u>id</u>, nome, slug, ordem)
 - **produtos** (<u>id</u>, *categoria_id*, nome, slug, descricao, ingredientes, preco_centavos, estoque, imagem_url, ativo, destaque, criado_em, atualizado_em)
 - **cupons** (<u>id</u>, codigo, tipo, valor, valor_minimo_centavos, valido_ate, ativo)
-- **pedidos** (<u>id</u>, *usuario_id*, *cupom_id*, status, tipo_entrega, entrega_cep, entrega_logradouro, entrega_numero, entrega_complemento, entrega_bairro, entrega_cidade, entrega_uf, subtotal_centavos, desconto_centavos, frete_centavos, total_centavos, observacao, criado_em, atualizado_em)
+- **zonas_entrega** (<u>id</u>, nome, cep_inicial, cep_final, valor_centavos, frete_gratis_a_partir_centavos, prazo_horas, ativo, criado_em)
+- **pedidos** (<u>id</u>, *usuario_id*, *cupom_id*, *zona_entrega_id*, status, tipo_entrega, entrega_cep, entrega_logradouro, entrega_numero, entrega_complemento, entrega_bairro, entrega_cidade, entrega_uf, subtotal_centavos, desconto_centavos, frete_centavos, total_centavos, observacao, criado_em, atualizado_em)
 - **itens_pedido** (<u>id</u>, *pedido_id*, *produto_id*, nome_produto, preco_unitario_centavos, quantidade, subtotal_centavos)
 - **pagamentos** (<u>id</u>, *pedido_id*, metodo, status, valor_centavos, codigo_transacao, pix_copia_e_cola, cartao_final, criado_em, atualizado_em)
 - **historico_status_pedido** (<u>id</u>, *pedido_id*, status, observacao, criado_em)
@@ -122,6 +136,7 @@ Notação: **sublinhado** = chave primária, *itálico* = chave estrangeira.
 | Onde | Por quê |
 |---|---|
 | `itens_pedido.nome_produto` e `preco_unitario_centavos` | **Snapshot histórico**: se o produto mudar de nome ou preço, o pedido antigo continua mostrando o que o cliente comprou e pagou |
+| `frete_centavos` em `pedidos` além de `zona_entrega_id` | O frete cobrado fica congelado; se a loja mudar o valor da zona depois, o pedido antigo não muda |
 | Colunas `entrega_*` em `pedidos` | O endereço da entrega é um fato do pedido. Se o cliente editar ou apagar o endereço salvo, a entrega já feita não muda |
 | `subtotal`, `desconto`, `frete`, `total` em `pedidos` e `subtotal_centavos` no item | Valores calculados e **congelados** no momento da compra (regras de frete e cupom podem mudar depois); também evitam recalcular em relatórios |
 
@@ -129,7 +144,7 @@ Notação: **sublinhado** = chave primária, *itálico* = chave estrangeira.
 
 O modelo físico é gerado a partir de `src/models/db/schema.ts` (ORM Drizzle) e versionado como migração SQL:
 
-- DDL completo: [`database/migrations/0000_estrutura_inicial.sql`](../../database/migrations/0000_estrutura_inicial.sql)
+- DDL completo: [`database/migrations/0000_estrutura_inicial.sql`](../../database/migrations/0000_estrutura_inicial.sql) (estrutura inicial) e [`database/migrations/0001_zonas_de_entrega.sql`](../../database/migrations/0001_zonas_de_entrega.sql) (zonas de entrega e `pedidos.zona_entrega_id`, criada na revisão Kaizen)
 - Dados iniciais (seed): [`database/seed.ts`](../../database/seed.ts)
 - Dicionário de dados: [`database/dicionario-de-dados.md`](../../database/dicionario-de-dados.md)
 
@@ -157,6 +172,9 @@ O modelo físico é gerado a partir de `src/models/db/schema.ts` (ORM Drizzle) e
 | `itens_pedido_qtd_ck` | itens_pedido | Quantidade maior que zero |
 | `pedidos_total_ck` | pedidos | Total não negativo |
 | `pedidos_endereco_ck` | pedidos | Pedido de ENTREGA precisa ter CEP e logradouro |
+| `zonas_cep_ck` | zonas_entrega | CEP inicial e final com 8 dígitos e `cep_inicial <= cep_final` |
+| `zonas_valor_ck` | zonas_entrega | Frete `>= 0` (0 = sempre grátis) |
+| `zonas_prazo_ck` | zonas_entrega | Prazo em horas `> 0` |
 | `pagamentos_pedido_uk` | pagamentos | Um pagamento por pedido |
 
 ### Ações referenciais
@@ -167,6 +185,7 @@ O modelo físico é gerado a partir de `src/models/db/schema.ts` (ORM Drizzle) e
 | produtos → categorias | RESTRICT | Não se apaga categoria com produtos |
 | pedidos → usuarios | RESTRICT | Histórico de vendas não pode sumir |
 | pedidos → cupons | SET NULL | Cupom removido não apaga pedidos |
+| pedidos → zonas_entrega | SET NULL | Zona removida não apaga pedidos (o frete cobrado continua gravado no pedido) |
 | itens/pagamentos/histórico → pedidos | CASCADE | Partes do pedido (composição) |
 | itens_pedido → produtos | RESTRICT | Produto já vendido é desativado, não excluído |
 
@@ -179,6 +198,7 @@ O modelo físico é gerado a partir de `src/models/db/schema.ts` (ORM Drizzle) e
 | `pedidos_status_idx` | Filtro de pedidos por situação no painel |
 | `itens_pedido_pedido_idx`, `historico_pedido_idx` | Montagem do detalhe do pedido |
 | `enderecos_usuario_idx` | Endereços salvos no checkout |
+| `zonas_faixa_idx` (cep_inicial, cep_final) | Busca da zona que cobre o CEP na cotação de frete |
 
 ### Como recriar o banco
 

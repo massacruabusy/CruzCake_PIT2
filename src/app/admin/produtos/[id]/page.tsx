@@ -8,7 +8,7 @@ import { garantirAdminNaPagina } from "@/lib/guardas";
 
 async function imagensDisponiveis() {
   const arquivos = await readdir(path.join(process.cwd(), "public", "img", "cupcakes"));
-  return arquivos.filter((a) => a.endsWith(".svg")).map((a) => `/img/cupcakes/${a}`);
+  return arquivos.filter((a) => /\.(svg|jpe?g|png|webp)$/i.test(a)).map((a) => `/img/cupcakes/${a}`);
 }
 
 export default async function PaginaEditarProduto(props: PageProps<"/admin/produtos/[id]">) {
