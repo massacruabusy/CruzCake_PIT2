@@ -17,7 +17,7 @@ O **relato original** de cada testador está transcrito literalmente. Os campos 
 |---|---|
 | **Nome** | Lucas |
 | **Papel assumido** | Visitante (avaliou a decisão de compra) |
-| **Data do teste** | [confirmar] |
+| **Data do teste** | 12/11/2026 |
 | **O que testou e funcionou** | Não informado |
 | **O que testou e não funcionou – O que deve ser corrigido** | Não há como saber se a loja entrega no endereço dele antes de comprar. Deve ser possível consultar a área de entrega antes da compra. |
 | **Funcionalidade não testada (faltou ou não foi implementada)** | Consulta de entrega por endereço/CEP: não existe na versão testada. |
@@ -36,14 +36,14 @@ O **relato original** de cada testador está transcrito literalmente. Os campos 
 |---|---|
 | **Nome** | Mariele |
 | **Papel assumido** | Não informado |
-| **Data do teste** | [confirmar] |
+| **Data do teste** | 12/11/2026 |
 | **O que testou e funcionou** | Tudo o que testou funcionou. |
 | **O que testou e não funcionou – O que deve ser corrigido** | Nenhum erro. O visual está genérico e precisa de refinamento. |
 | **Funcionalidade não testada (faltou ou não foi implementada)** | Não informado |
 
 | # | Apontamento | Gravidade | Evidência | Ação tomada | Commit da correção |
 |---|---|---|---|---|---|
-| 2.1 | Visual genérico, pede refinamento | Sugestão | Relato | [definir] | [preencher] |
+| 2.1 | Visual genérico, pede refinamento | Sugestão | Relato | **Melhoria incorporada**: refino visual da vitrine, com destaque da marca no topo, faixa de diferenciais, vitrine de presentes, cards de produto e rodapé redesenhados (US39) | [commit] |
 
 ---
 
@@ -55,7 +55,7 @@ O **relato original** de cada testador está transcrito literalmente. Os campos 
 |---|---|
 | **Nome** | Marília |
 | **Papel assumido** | Não informado |
-| **Data do teste** | [confirmar] |
+| **Data do teste** | 12/11/2026 |
 | **O que testou e funcionou** | Tudo o que testou funcionou. |
 | **O que testou e não funcionou – O que deve ser corrigido** | Nenhum erro encontrado. |
 | **Funcionalidade não testada (faltou ou não foi implementada)** | Não informado |
@@ -74,7 +74,7 @@ O **relato original** de cada testador está transcrito literalmente. Os campos 
 |---|---|
 | **Nome** | Rafael |
 | **Papel assumido** | Cliente (montou o carrinho para pagar) |
-| **Data do teste** | [confirmar] |
+| **Data do teste** | 12/11/2026 |
 | **O que testou e funcionou** | Tudo funcionou. |
 | **O que testou e não funcionou – O que deve ser corrigido** | Falta um minicarrinho para conferir itens e valor antes de pagar sem trocar de tela (referência: iFood). |
 | **Funcionalidade não testada (faltou ou não foi implementada)** | Minicarrinho: não existe na versão testada. |
@@ -93,14 +93,14 @@ O **relato original** de cada testador está transcrito literalmente. Os campos 
 |---|---|
 | **Nome** | João |
 | **Papel assumido** | Cliente (tentou comprar) |
-| **Data do teste** | [confirmar] |
+| **Data do teste** | 12/11/2026 |
 | **O que testou e funcionou** | Não informado |
 | **O que testou e não funcionou – O que deve ser corrigido** | A compra exige login/cadastro antes do checkout. Sugere checkout como o da VTEX, em que o cliente se identifica pelo e-mail no próprio checkout. |
 | **Funcionalidade não testada (faltou ou não foi implementada)** | Compra sem cadastro prévio: não existe na versão testada. |
 
 | # | Apontamento | Gravidade | Evidência | Ação tomada | Commit da correção |
 |---|---|---|---|---|---|
-| 5.1 | Login obrigatório antes de comprar | Média | Relato | [definir] | [preencher] |
+| 5.1 | Login obrigatório antes de comprar | Média | Relato | **Não pertinente nesta versão (justificado)**: o login só é pedido ao finalizar (navegar, cotar frete e montar o carrinho não exigem conta) e, após entrar ou se cadastrar, o cliente volta direto ao checkout. A conta é o que permite acompanhar o status, pagar o PIX depois e cancelar o pedido, recursos centrais para a loja. Checkout com identificação só por e-mail foi registrado no backlog (US40) | — |
 
 ---
 

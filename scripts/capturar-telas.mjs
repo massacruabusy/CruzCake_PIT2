@@ -53,7 +53,20 @@ async function definirCarrinho(page, itens, cupom = "") {
   await page.evaluate(([l, c]) => localStorage.setItem("cruzcake:carrinho:v1", JSON.stringify({ itens: l, cupom: c })), [linhas, cupom]);
 }
 
-const foto = (page, nome, opcoes = {}) => page.screenshot({ path: `${PASTA}/${nome}.jpg`, quality: 85, type: "jpeg", ...opcoes });
+async function foto(page, nome, opcoes = {}) {
+  if (opcoes.fullPage) {
+    // Rola a página inteira para carregar as imagens com lazy loading antes da captura.
+    await page.evaluate(async () => {
+      for (let y = 0; y < document.body.scrollHeight; y += 400) {
+        window.scrollTo(0, y);
+        await new Promise((r) => setTimeout(r, 60));
+      }
+      window.scrollTo(0, 0);
+    });
+    await page.waitForLoadState("networkidle");
+  }
+  await page.screenshot({ path: `${PASTA}/${nome}.jpg`, quality: 85, type: "jpeg", caret: "initial", ...opcoes });
+}
 
 async function preencherCartao(page, numero) {
   await page.getByLabel("Cartão de crédito").check();
@@ -71,9 +84,11 @@ async function main() {
   const m = await celular.newPage();
 
   await m.goto(`${BASE}/`);
+  await foto(m, "tela-01-vitrine-mobile");
   await m.locator("#titulo-cardapio").scrollIntoViewIfNeeded();
   await m.evaluate(() => window.scrollBy(0, -70));
-  await foto(m, "tela-01-vitrine-mobile");
+  await m.waitForLoadState("networkidle");
+  await foto(m, "tela-01-vitrine-mobile-cardapio");
   await m.getByRole("button", { name: "Adicionar" }).nth(1).click();
   await m.getByRole("dialog", { name: /Seu carrinho/ }).waitFor();
   await foto(m, "tela-03-minicarrinho");
@@ -123,6 +138,8 @@ async function main() {
   // ---------- Desktop ----------
   const desktop = await navegador.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1.5 });
   const d = await desktop.newPage();
+  await d.goto(`${BASE}/`);
+  await foto(d, "tela-01-vitrine-desktop", { fullPage: true });
   await entrar(d, CLIENTE);
   await definirCarrinho(d, [["red-velvet", 3], ["pistache-siciliano", 2]], "BEMVINDO10");
   await d.goto(`${BASE}/checkout`);
