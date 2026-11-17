@@ -55,7 +55,7 @@ No PIT I o trabalho registrou o processo de imersão e o backlog inicial (≈ 30
 
 ### Evoluções incorporadas
 
-Na segunda volta do ciclo Kaizen, o backlog foi revisto com base em situações comuns de e-commerce e cresceu para 38 histórias (108 pontos). Foram implementadas:
+Na segunda volta do ciclo Kaizen, o backlog foi revisto com base em situações comuns de e-commerce e cresceu para 38 histórias (108 pontos); depois da validação com 5 usuários (12/11/2026) chegou a 40 histórias (116 pontos), com a US39 (refino visual) implementada e a US40 (checkout sem senha) no backlog. Foram implementadas:
 
 | Evolução | História | O que mudou |
 |---|---|---|

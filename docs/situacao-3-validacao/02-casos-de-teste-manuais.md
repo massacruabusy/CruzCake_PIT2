@@ -21,6 +21,8 @@ Roteiro ponta a ponta executado no navegador, que corresponde ao nível **Teste 
 
 ## Resumo da execução
 
+**Validação com usuários: concluída em 12/11/2026** (5 testadores; ver [fichas](04-fichas-dos-testadores.md) e [laudo](05-laudo-de-qualidade.md)). Os casos abaixo são o roteiro de teste de sistema do desenvolvedor.
+
 | CT | Título | Tela(s) | RN | Status |
 |---|---|---|---|---|
 | CT-01 | Checkout com cartão recusado | TELA-06 | RN03, RN06 | Passou |

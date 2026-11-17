@@ -55,7 +55,7 @@ flowchart LR
 | **Código ↔ Teste unitário** | Regras puras do Model: frete, cupom, totais, máquina de estados, cancelamento, pagamento simulado (Luhn, validade, CVV, recusa), PIX, utilitários de dinheiro e texto. Também os contratos de validação do Controller (Zod) | Vitest, automatizado | `tests/unit/*.test.ts` |
 | **Arquitetura ↔ Teste de integração** | Serviços do Model rodando contra um **PostgreSQL real em memória (PGlite)**, com as mesmas migrações de produção: autenticação, vitrine, carrinho, checkout transacional (rollback), estoque, PIX, cancelamento, permissões e painel admin | Vitest + PGlite, automatizado | `tests/integration/*.test.ts` |
 | **Análise ↔ Teste de sistema** | Fluxos ponta a ponta no navegador, passando por View → Controller → Model → banco, incluindo mensagens de erro, responsividade e teclado | Roteiro manual | [02-casos-de-teste-manuais.md](02-casos-de-teste-manuais.md) |
-| **Requisitos ↔ Teste de aceitação** | Se a solução atende às necessidades de quem compra e de quem administra a loja | 5 testadores reais usando o app publicado e preenchendo o formulário | [03-formulario-teste-usuarios.md](03-formulario-teste-usuarios.md), [04-fichas-dos-testadores.md](04-fichas-dos-testadores.md) |
+| **Requisitos ↔ Teste de aceitação** | Se a solução atende às necessidades de quem compra e de quem administra a loja | 5 testadores reais usando o app publicado e devolvendo a ficha por Slack/WhatsApp (concluído em 12/11/2026) | [03-formulario-teste-usuarios.md](03-formulario-teste-usuarios.md), [04-fichas-dos-testadores.md](04-fichas-dos-testadores.md) |
 
 ## 5. Ferramentas e ambiente
 
@@ -109,7 +109,9 @@ Os testes não precisam de banco instalado, porque cada teste de integração cr
 
 ## 8. Resultado atual da execução automatizada
 
-Execução em 09/11/2026 (após as evoluções da revisão Kaizen): **4 arquivos, 62 testes, 62 passando, 0 falhas.**
+Execução em 16/11/2026 (branch `v2-melhorias`, após as melhorias da validação): **5 arquivos, 63 testes, 63 passando, 0 falhas.**
+
+**Validação com usuários: concluída em 12/11/2026** (5 testadores; resultado no [laudo](05-laudo-de-qualidade.md)).
 
 | Arquivo | Grupo (`describe`) | Testes |
 |---|---|---|
@@ -127,7 +129,8 @@ Execução em 09/11/2026 (após as evoluções da revisão Kaizen): **4 arquivos
 | | Frete por CEP | 4 |
 | | Checkout e ciclo do pedido | 10 |
 | | Administração | 2 |
-| **Total** | | **62** |
+| `tests/integration/seed-upgrade.test.ts` | Atualização do banco da v1 para a v2 | 1 |
+| **Total** | | **63** |
 
 Para anexar como evidência, salve a saída do terminal em `evidencias/TESTES-AUTOMATIZADOS_saida.png` (print) ou `.txt`.
 

@@ -28,6 +28,7 @@ flowchart LR
     V --> US07["US07 Detalhe do produto"]
     V --> US35["US35 Esconder esgotados"]
     V --> US36["US36 Kits em destaque"]
+    V --> US39["US39 Identidade visual da vitrine"]
 
     C --> US08["US08 Adicionar ao carrinho"]
     C --> US09["US09 Alterar e remover"]
@@ -39,6 +40,7 @@ flowchart LR
     K --> US12["US12 Criar conta"]
     K --> US13["US13 Entrar e sair"]
     K --> US14["US14 Recuperar senha *"]
+    K --> US40["US40 Checkout sem senha *"]
 
     P --> US15["US15 Entrega ou retirada"]
     P --> US16["US16 CEP automático"]
@@ -66,7 +68,7 @@ flowchart LR
 
 `*` indica história do backlog futuro (fora do MVP).
 
-As histórias US33 a US38 entraram na revisão Kaizen do PIT II (evoluções a partir de situações comuns de e-commerce).
+As histórias US33 a US38 entraram na revisão Kaizen do PIT II. Na validação com os 5 testadores (12/11/2026), a US33 e a US37 foram confirmadas pelo feedback (Lucas e Rafael) e surgiram a US39 (refino visual, pedido da Mariele) e a US40 (checkout sem senha, pedido do João, que ficou no backlog).
 
 **Leitura do mapa:** o núcleo do negócio (vitrine → carrinho → checkout/pagamento → acompanhamento) concentra a maior parte dos pontos e da prioridade [A]. O eixo de administração é o que **evita a repetição do fracasso do app anterior**: sem estoque confiável e sem gestão de status, o cliente recebe promessas que a loja não cumpre.
 
@@ -106,15 +108,17 @@ A prioridade segue a escala do template, de **[A]** (essencial para lançar) a *
 | 28 | US35 | Como cliente, quero ver na vitrine só o que dá para comprar hoje | 1 | B | Vitrine | 5 |
 | 29 | US36 | Como visitante, quero identificar rapidamente as caixas e kits para presente | 2 | B | Vitrine | 5 |
 | 30 | US37 | Como cliente, quero um minicarrinho para conferir o carrinho sem sair da página | 3 | B | Carrinho | 5 |
-| 31 | US14 | Como cliente, quero recuperar minha senha por e-mail | 3 | C | Conta | Futuro |
-| 32 | US22 | Como dona da loja, quero integrar um gateway de pagamento real | 5 | C | Checkout | Futuro |
-| 33 | US32 | Como administradora, quero relatórios de vendas | 3 | C | Administração | Futuro |
-| 34 | US38 | Como administradora, quero programar preço promocional com início e fim | 3 | C | Administração | Futuro |
-| 35 | US21 | Como cliente, quero agendar uma janela de entrega | 3 | D | Checkout | Futuro |
-| 36 | US26 | Como cliente, quero notificações de status no WhatsApp ou por e-mail | 3 | D | Pós-venda | Futuro |
-| 37 | US31 | Como cliente, quero encomendas personalizadas para festas | 5 | D | Administração | Futuro |
-| 38 | US27 | Como cliente, quero avaliar os sabores que comprei | 2 | E | Pós-venda | Futuro |
-| | | **Total** | **108** | | | |
+| 31 | US39 | Como visitante, quero uma vitrine com identidade visual mais forte | 3 | B | Vitrine | 6 |
+| 32 | US14 | Como cliente, quero recuperar minha senha por e-mail | 3 | C | Conta | Futuro |
+| 33 | US22 | Como dona da loja, quero integrar um gateway de pagamento real | 5 | C | Checkout | Futuro |
+| 34 | US32 | Como administradora, quero relatórios de vendas | 3 | C | Administração | Futuro |
+| 35 | US38 | Como administradora, quero programar preço promocional com início e fim | 3 | C | Administração | Futuro |
+| 36 | US40 | Como cliente, quero comprar informando só o e-mail, sem criar senha antes | 5 | C | Conta | Futuro |
+| 37 | US21 | Como cliente, quero agendar uma janela de entrega | 3 | D | Checkout | Futuro |
+| 38 | US26 | Como cliente, quero notificações de status no WhatsApp ou por e-mail | 3 | D | Pós-venda | Futuro |
+| 39 | US31 | Como cliente, quero encomendas personalizadas para festas | 5 | D | Administração | Futuro |
+| 40 | US27 | Como cliente, quero avaliar os sabores que comprei | 2 | E | Pós-venda | Futuro |
+| | | **Total** | **116** | | | |
 
 ## 3. Plano de sprints (2 semanas cada)
 
@@ -126,8 +130,9 @@ A prioridade segue a escala do template, de **[A]** (essencial para lançar) a *
 | **3** — Pós-venda e administração | A loja opera os pedidos e o cliente acompanha | US23, US24, US25, US28, US29, US30 | 20 |
 | **4** — Validação | Testes com 5 usuários, correções, laudo de qualidade e vídeo (Situação 3 do PIT II) | Correções vindas do feedback | — |
 | **5** — Evoluções | Frete por zona com cotação pública, vitrine sem esgotados, kits em destaque e minicarrinho (revisão Kaizen) | US33, US34, US35, US36, US37 | 14 |
+| **6** — Pós-validação | Responder ao feedback dos 5 testadores (12/11/2026): refino visual da vitrine; checkout sem senha avaliado e levado ao backlog | US39 | 3 |
 
-A velocidade planejada é de cerca de 20 pontos por sprint. O MVP original (67 pontos) cabe em 4 sprints de desenvolvimento; a sprint 5 incorporou as evoluções (14 pontos), totalizando 81 pontos entregues. O backlog futuro (27 pontos) fica para os próximos ciclos, já com a loja vendendo.
+A velocidade planejada é de cerca de 20 pontos por sprint. O MVP original (67 pontos) cabe em 4 sprints de desenvolvimento; a sprint 5 incorporou as evoluções (14 pontos) e a sprint 6 o refino visual pedido na validação (3 pontos), totalizando 84 pontos entregues. O backlog futuro (32 pontos, incluindo a US40) fica para os próximos ciclos, já com a loja vendendo.
 
 **Definição de Pronto (DoD):** critérios de aceitação atendidos; regras de negócio cobertas por teste automatizado (`npm test`); `npm run lint`, `npm run typecheck` e `npm run build` sem erros; mensagens de erro revisadas; tela testada em largura de celular (360 px).
 

@@ -43,7 +43,7 @@ O **relato original** de cada testador está transcrito literalmente. Os campos 
 
 | # | Apontamento | Gravidade | Evidência | Ação tomada | Commit da correção |
 |---|---|---|---|---|---|
-| 2.1 | Visual genérico, pede refinamento | Sugestão | Relato | **Melhoria incorporada**: refino visual da vitrine, com destaque da marca no topo, faixa de diferenciais, vitrine de presentes, cards de produto e rodapé redesenhados (US39) | [commit] |
+| 2.1 | Visual genérico, pede refinamento | Sugestão | Relato | **Melhoria incorporada**: refino visual da vitrine, com destaque da marca no topo, faixa de diferenciais, vitrine de presentes, cards de produto e rodapé redesenhados (US39) | `b84f362` |
 
 ---
 

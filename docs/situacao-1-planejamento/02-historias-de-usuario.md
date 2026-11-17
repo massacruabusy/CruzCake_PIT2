@@ -594,7 +594,7 @@ Histórias acrescentadas na revisão do PIT II a partir de situações comuns em
 | **Prioridade** | [A] |
 | **Pontos de história** | 3 |
 | **Status no MVP** | Implementado |
-| **Origem** | Evolução proposta a partir de situações reais de e-commerce |
+| **Origem** | Feedback do testador Lucas em 12/11/2026 (ficha 1): "como vou comprar cupcake sem saber p onde entrega?" |
 
 ### US34 — Gerenciar zonas de entrega e frete
 
@@ -611,7 +611,7 @@ Histórias acrescentadas na revisão do PIT II a partir de situações comuns em
 | **Prioridade** | [A] |
 | **Pontos de história** | 5 |
 | **Status no MVP** | Implementado |
-| **Origem** | Evolução proposta a partir de situações reais de e-commerce |
+| **Origem** | Evolução Kaizen que complementa o feedback do Lucas (ficha 1): a loja precisa definir onde entrega para a cotação da US33 funcionar |
 
 ### US35 — Ver na vitrine só o que dá para comprar hoje
 
@@ -662,7 +662,7 @@ Histórias acrescentadas na revisão do PIT II a partir de situações comuns em
 | **Prioridade** | [B] |
 | **Pontos de história** | 3 |
 | **Status no MVP** | Implementado |
-| **Origem** | Evolução proposta a partir de situações reais de e-commerce |
+| **Origem** | Feedback do testador Rafael em 12/11/2026 (ficha 4): pediu um minicart para conferir o valor do carrinho sem trocar de tela, como no iFood |
 
 ### US38 — Programar preço promocional
 
@@ -681,14 +681,52 @@ Histórias acrescentadas na revisão do PIT II a partir de situações comuns em
 | **Status no MVP** | Backlog futuro |
 | **Origem** | Evolução proposta a partir de situações reais de e-commerce |
 
+## Histórias da validação com usuários (12/11/2026)
+
+Histórias criadas a partir das fichas dos testadores que não correspondiam a nenhuma evolução já planejada.
+
+### US39 — Vitrine com identidade visual mais forte
+
+| Campo | Conteúdo |
+|---|---|
+| **ID** | US39 |
+| **Título** | Vitrine com identidade visual mais forte |
+| **Requerente** | Testadora Mariele / dona da loja |
+| **Ação** | Como **visitante**, eu quero **uma vitrine com cara de loja de verdade, que comunique a marca e os diferenciais** para que **eu confie na loja e tenha vontade de comprar**. |
+| **Comentários** | Refino visual (commit b84f362): topo azul-marinho com a marca e os botões "Ver cardápio" e "Caixas para presente"; faixa com 3 diferenciais (Feitos no dia, Entrega rápida, Retire sem frete); seção "Para presentear" com os kits; título "Cardápio do dia" com estrela; cards de produto redesenhados (cantos maiores, gradiente, elevação ao passar o mouse); rodapé azul-marinho com colunas de marca, loja, compra e pagamento. Fotos reais podem substituir as ilustrações sem mudar o código (docs/guia-fotos-produtos.md). |
+| **Critérios de aceitação** | CA#1 DADO a vitrine sem filtro, QUANDO abro a página, ENTÃO vejo o topo com a marca, os botões de ação e a faixa de diferenciais.<br>CA#2 DADO que existem kits disponíveis, QUANDO abro a vitrine, ENTÃO vejo a seção "Para presentear" antes do cardápio.<br>CA#3 DADO o celular (390 px), QUANDO navego, ENTÃO o layout não tem rolagem horizontal e os selos dos cards cabem em uma linha. |
+| **Regras de negócio** | RN09 |
+| **Requisito não funcional** | RNF#1 Contraste adequado (texto claro sobre azul-marinho). RNF#2 Mobile-first. |
+| **Prioridade** | [B] |
+| **Pontos de história** | 3 |
+| **Status no MVP** | Implementado |
+| **Origem** | Feedback da testadora Mariele em 12/11/2026 (ficha 2): "ta bem generico, né? eu daria uma refinada no visual" |
+
+### US40 — Comprar sem criar senha antes (checkout identificado por e-mail)
+
+| Campo | Conteúdo |
+|---|---|
+| **ID** | US40 |
+| **Título** | Comprar sem criar senha antes (checkout identificado por e-mail) |
+| **Requerente** | Testador João / cliente final |
+| **Ação** | Como **cliente**, eu quero **finalizar a compra informando só meu e-mail e dados de entrega, sem criar senha antes** para que **eu compre mais rápido, como em lojas VTEX**. |
+| **Comentários** | Nesta versão o login é exigido só ao finalizar (navegar, cotar frete e montar o carrinho não exigem conta) e, após entrar ou se cadastrar, o cliente volta direto ao checkout. A conta permite acompanhar o status, pagar o PIX depois e cancelar o pedido, recursos centrais para a loja. A identificação por e-mail exigiria um fluxo seguro de acesso posterior ao pedido (link mágico ou código por e-mail), fora do escopo atual. Decisão registrada no laudo de qualidade. |
+| **Critérios de aceitação** | CA#1 DADO um visitante com carrinho, QUANDO informa e-mail e endereço no checkout, ENTÃO consegue pagar sem criar senha.<br>CA#2 DADO o pedido criado assim, QUANDO o cliente recebe o e-mail, ENTÃO consegue acompanhar e cancelar pelo link recebido. |
+| **Regras de negócio** | RN08, RN10 |
+| **Requisito não funcional** | RNF#1 Envio de e-mail transacional. RNF#2 Link de acesso com expiração. |
+| **Prioridade** | [C] |
+| **Pontos de história** | 5 |
+| **Status no MVP** | Backlog futuro |
+| **Origem** | Feedback do testador João em 12/11/2026 (ficha 5): "precisa fazer login pra comprar? n da pra ter um chekout tipo vtex?" |
+
 ---
 
 ## Totais
 
 | Situação | Histórias | Pontos |
 |---|---|---|
-| Implementadas no MVP | 30 (US01–US13, US15–US20, US23–US25, US28–US30, US33–US37) | 81 |
-| Backlog futuro | 8 (US14, US21, US22, US26, US27, US31, US32, US38) | 27 |
-| **Total** | **38** | **108** |
+| Implementadas no MVP | 31 (US01–US13, US15–US20, US23–US25, US28–US30, US33–US37, US39) | 84 |
+| Backlog futuro | 9 (US14, US21, US22, US26, US27, US31, US32, US38, US40) | 32 |
+| **Total** | **40** | **116** |
 
-O levantamento do PIT I registrou cerca de 30 cartões e 90 pontos (32 cartões / 91 pontos na primeira revisão). Na revisão Kaizen do PIT II o backlog cresceu para 38 cartões e 108 pontos com as evoluções US33–US38. A história de frete fixo (US11) foi revisada para a regra de frete por zona.
+O levantamento do PIT I registrou cerca de 30 cartões e 90 pontos (32 cartões / 91 pontos na primeira revisão). Na revisão Kaizen do PIT II o backlog cresceu para 38 cartões e 108 pontos com as evoluções US33–US38. Depois da validação com os 5 testadores (12/11/2026) foram criadas a US39 (refino visual, implementada) e a US40 (checkout sem senha, backlog), totalizando 40 cartões e 116 pontos. A história de frete fixo (US11) foi revisada para a regra de frete por zona.

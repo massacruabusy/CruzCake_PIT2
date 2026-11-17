@@ -13,7 +13,7 @@
 | **Direta** | Adicionar ao carrinho atualiza o contador do cabeçalho na hora e abre o minicarrinho com o item, sem sair da página |
 | **Empática e reversível** | Cancelamento pede confirmação; o carrinho fica salvo no navegador mesmo se a página falhar; mensagens explicam o que fazer em seguida |
 | **Dá resposta (feedback)** | Botões mostram "Processando…", avisos *toast* em `aria-live`, linha do tempo do pedido |
-| **Esteticamente agradável** | Paleta da marca (azul-marinho + laranja estrela sobre creme), tipografia arredondada (Nunito), ilustrações de cupcake |
+| **Esteticamente agradável** | Paleta da marca (azul-marinho + laranja estrela sobre creme), tipografia arredondada (Nunito), ilustrações de cupcake. Após a validação (feedback da Mariele, US39), a vitrine ganhou topo com a marca, faixa de diferenciais, seção de presentes, cards com mais profundidade e rodapé completo |
 
 ### Identidade visual
 
@@ -30,6 +30,19 @@ O logo é um cupcake com uma **estrela laranja em traço contínuo** no lugar da
 | Tipografia | Nunito (títulos em peso 900, texto 400–700) |
 | Componentes | cantos arredondados (12–24 px), botões em pílula |
 | Arquivos | `public/logo.svg`, `src/app/icon.svg` (favicon), componente `src/components/Logo.tsx` |
+
+### Refino visual após a validação (US39)
+
+A testadora Mariele achou o visual "bem genérico" (ficha 2, 12/11/2026). Mudanças incorporadas no commit `b84f362`:
+
+| Área | Antes (v1) | Depois (v2) |
+|---|---|---|
+| Topo da vitrine | Banner claro só com texto e cupom | Bloco azul-marinho com a marca, título com destaque em laranja, botões "Ver cardápio" e "Caixas para presente" e cupom em destaque |
+| Diferenciais | Não havia | Faixa com 3 cartões: Feitos no dia, Entrega rápida e Retire sem frete |
+| Presentes | Kits misturados no cardápio | Seção "Para presentear" com os kits antes do cardápio |
+| Cardápio | Título "Cardápio" | "★ Cardápio do dia", com chips de categoria destacados |
+| Cards de produto | Cartão simples | Cantos maiores, fundo em gradiente, elevação ao passar o mouse, selos que cabem numa linha no celular |
+| Rodapé | Duas linhas de texto | Rodapé azul-marinho em colunas: marca, loja, compre e formas de pagamento |
 
 ### Acessibilidade
 
@@ -149,7 +162,7 @@ flowchart LR
 
 | Tela | Rota | Elementos principais | Validações e regras | Mensagens |
 |---|---|---|---|---|
-| TELA-01 Vitrine | `/` | Banner com cupom, busca, filtros por categoria (chips, "Caixas e kits" em 2º), grade de cards (2 colunas no celular, 4 no desktop) | Só produtos ativos **e com estoque** (RN09); destaques primeiro | "Nenhum cupcake encontrado." + botão "Ver todos os sabores"; selos "★ Destaque", "Últimas N", "📦 Kit para presentear" |
+| TELA-01 Vitrine | `/` | Topo com a marca e botões de ação, faixa de diferenciais, seção "Para presentear" (kits), banner com cupom, busca, filtros por categoria (chips, "Caixas e kits" em 2º), grade de cards (2 colunas no celular, 4 no desktop) | Só produtos ativos **e com estoque** (RN09); destaques primeiro | "Nenhum cupcake encontrado." + botão "Ver todos os sabores"; selos "★ Destaque", "Últimas N", "📦 Kit para presentear" |
 | TELA-02 Produto | `/produto/[slug]` | Trilha de navegação, imagem (kits mostram a caixa com os cupcakes), preço, descrição, ingredientes (expansível), seletor de quantidade, "Adicionar", bloco **"Entregamos no seu endereço?"** (CEP + Calcular) | Quantidade entre 1 e o menor valor entre estoque e 24 (RN04); CEP com 8 dígitos; frete pela zona (RN02) | "Esgotado hoje — volte amanhã!", "Últimas N unidades", "Disponível para hoje", "📍 Rua…, Bairro · Cidade/UF", "Entregamos! [zona]: em até Nh após o preparo, por R$ X · grátis a partir de R$ Y.", "Ainda não entregamos no CEP… Você pode retirar na loja sem custo", "CEP não encontrado. Confira os números.", "Digite os 8 números do CEP." |
 | Minicarrinho | gaveta sobre qualquer tela | Itens com +/−/Remover, subtotal, "Ver carrinho e finalizar", "Continuar comprando", × | Abre pelo ícone do carrinho e ao adicionar; `role="dialog"`, foco no ×, Esc e clique fora fecham; valores de referência (oficiais no carrinho) | "Seu carrinho está vazio", "Cupom e frete são calculados no carrinho." |
 | TELA-03 Carrinho | `/carrinho` | Lista de itens com +/−/Remover, cupom, cotação de frete pelo CEP, resumo (subtotal, desconto, frete, total), "Finalizar compra" | Preço, estoque e frete oficiais vêm do servidor; botão bloqueado se houver problema | "Temos apenas N unidade(s)…", "X esgotou.", "O cupom X está vencido.", "vale para compras a partir de R$…", "Frete: Informe o CEP" / "Total sem frete" |
@@ -228,9 +241,9 @@ Capturas da aplicação em funcionamento, geradas automaticamente com `npm run t
 
 ### Jornada do cliente (celular)
 
-| Vitrine | Minicarrinho (abre ao adicionar) | Carrinho com erros de estoque e cupom |
-|---|---|---|
-| ![Vitrine](img/tela-01-vitrine-mobile.jpg) | ![Minicarrinho](img/tela-03-minicarrinho.jpg) | ![Carrinho](img/tela-03-carrinho-erros.jpg) |
+| Vitrine (topo) | Vitrine (presentes e cardápio) | Minicarrinho (abre ao adicionar) | Carrinho com erros de estoque e cupom |
+|---|---|---|---|
+| ![Vitrine](img/tela-01-vitrine-mobile.jpg) | ![Cardápio](img/tela-01-vitrine-mobile-cardapio.jpg) | ![Minicarrinho](img/tela-03-minicarrinho.jpg) | ![Carrinho](img/tela-03-carrinho-erros.jpg) |
 
 | Kit com arte da caixa e frete calculado | CEP fora da área de entrega |
 |---|---|
@@ -243,6 +256,10 @@ Capturas da aplicação em funcionamento, geradas automaticamente com `npm run t
 | Pedido aguardando PIX |
 |---|
 | ![Pedido PIX](img/tela-07-pedido-pix.jpg) |
+
+### Vitrine no desktop (página inteira, após o refino visual)
+
+![Vitrine desktop](img/tela-01-vitrine-desktop.jpg)
 
 ### Checkout no desktop
 
