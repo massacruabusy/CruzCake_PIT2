@@ -9,8 +9,8 @@ Projeto das disciplinas **Projeto Integrador Transdisciplinar em Engenharia de S
 | | |
 |---|---|
 | **Aplicação publicada** | https://cruz-cake-pit-2.vercel.app |
-| **Vídeo de apresentação** | `[preencher]` |
-| **Vídeo das melhorias** | `[preencher]` |
+| **Vídeo de apresentação** | https://youtu.be/FhQTHzisszA |
+| **Vídeo das melhorias** | https://youtu.be/-mynRHBNAGU |
 
 ## Funcionalidades
 

@@ -24,7 +24,7 @@ Resumo das melhorias (opcional, se houver espaço): planejamento revisado com as
 | Modo de Codificação | (X) Tradicional ( ) Low-code ( ) No-code |
 | Link do repositório no GitHub com os códigos abertos | https://github.com/massacruabusy/CruzCake_PIT2 |
 | Link da solução em funcionamento | https://cruz-cake-pit-2.vercel.app |
-| Link do vídeo narrado (no mínimo 5 min) | `[link]` (roteiro: `docs/situacao-2-desenvolvimento/04-roteiro-video-apresentacao.md`) |
+| Link do vídeo narrado (no mínimo 5 min) | https://youtu.be/FhQTHzisszA (roteiro: `docs/situacao-2-desenvolvimento/04-roteiro-video-apresentacao.md`) |
 
 ## Testes da solução
 
@@ -75,7 +75,7 @@ Evidências: telas antes/depois em `docs/situacao-1-planejamento/img/` e no víd
 
 ## Vídeo da solução atualizada
 
-**Link para o vídeo:** `[link]` (até 5 min; roteiro: `docs/situacao-3-validacao/06-roteiro-video-melhorias.md`)
+**Link para o vídeo:** https://youtu.be/-mynRHBNAGU (até 5 min; roteiro: `docs/situacao-3-validacao/06-roteiro-video-melhorias.md`)
 
 ---
 
@@ -83,9 +83,10 @@ Evidências: telas antes/depois em `docs/situacao-1-planejamento/img/` e no víd
 
 - [x] Criar o repositório público no GitHub pessoal e fazer o push
 - [x] Publicar na Vercel + Neon e testar o link em aba anônima
-- [ ] Gravar o vídeo narrado (≥ 5 min) e publicar (YouTube não listado ou Drive)
+- [x] Gravar o vídeo narrado (≥ 5 min) e publicar (YouTube não listado ou Drive)
 - [x] Enviar a ficha de teste para 5 colegas (Slack/WhatsApp)
 - [x] Preencher as 5 fichas, corrigir o que for pertinente e atualizar o laudo
-- [ ] Fazer o merge da `v2-melhorias` na `main` e publicar a v2
-- [ ] Gravar o vídeo das melhorias (≤ 5 min)
-- [ ] Preencher o `.docx` com os links e entregar no AVA
+- [x] Fazer o merge da `v2-melhorias` na `main` e publicar a v2
+- [x] Gravar o vídeo das melhorias (≤ 5 min)
+- [x] Preencher o `.docx` com os links
+- [ ] Entregar o PDF no AVA
